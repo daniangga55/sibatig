@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0c3470">
+  <title>Masuk | SIBATIG</title><link rel="stylesheet" href="styles.css">
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <section class="auth-showcase">
+      <a class="brand auth-brand" href="index.html"><span class="brand-mark"><svg viewBox="0 0 40 40"><path d="M11 12.5h7v18h-7zM22 8h7v22.5h-7z"/><path class="mark-accent" d="M8 33h24v3H8zM12 8l8-4 8 4v2H12z"/></svg></span><span class="brand-copy"><strong>SIBATIG</strong><span>Irban Tiga</span></span></a>
+      <div class="auth-message"><span class="eyebrow"><span class="live-dot"></span> Sistem terintegrasi</span><h1>Pengawasan yang lebih <em>tertata.</em></h1><p>Satu ruang kerja untuk mengelola, memantau, dan mendokumentasikan seluruh kegiatan pengawasan Irban Tiga.</p><div class="auth-benefits"><div><span>✓</span><p><strong>Pantau progres real-time</strong><small>Ketahui posisi setiap kegiatan dengan cepat.</small></p></div><div><span>✓</span><p><strong>Dokumen terpusat</strong><small>Temukan arsip pendukung tanpa hambatan.</small></p></div></div></div>
+      <div class="auth-quote"><p>“Integritas dalam pengawasan, akuntabilitas dalam pelayanan.”</p><span>Inspektorat Daerah · 2026</span></div>
+      <div class="auth-decoration"><i></i><i></i><i></i></div>
+    </section>
+    <section class="auth-form-side">
+      <div class="mobile-brand"><a class="brand" href="index.html"><span class="brand-mark"><svg viewBox="0 0 40 40"><path d="M11 12.5h7v18h-7zM22 8h7v22.5h-7z"/><path class="mark-accent" d="M8 33h24v3H8zM12 8l8-4 8 4v2H12z"/></svg></span><span class="brand-copy"><strong>SIBATIG</strong><span>Irban Tiga</span></span></a></div>
+      <div class="auth-form-wrap">
+        <div class="auth-heading"><span class="auth-kicker">Selamat datang kembali</span><h2>Masuk ke akun Anda</h2><p>Gunakan akun yang telah terdaftar untuk melanjutkan.</p></div>
+        <form class="auth-form" id="loginForm" novalidate>
+          <div class="form-field"><label for="email">Email atau nama pengguna</label><div class="input-with-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm8 8 8-5V6l-8 5-8-5v1l8 5Z"/></svg><input id="email" name="email" type="text" autocomplete="username" placeholder="nama@inspektorat.go.id" required></div><small class="field-error">Masukkan email atau nama pengguna.</small></div>
+          <div class="form-field"><div class="label-row"><label for="password">Kata sandi</label><a href="forgot-password.html">Lupa kata sandi?</a></div><div class="input-with-icon"><svg viewBox="0 0 24 24"><path d="M17 8h-1V6a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v10h14V10a2 2 0 0 0-2-2Zm-7-2a2 2 0 0 1 4 0v2h-4V6Zm3 10.7V18h-2v-1.3a2 2 0 1 1 2 0Z"/></svg><input id="password" name="password" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required minlength="6"><button class="password-toggle" type="button" data-toggle-password="password" aria-label="Tampilkan kata sandi"><svg viewBox="0 0 24 24"><path d="M12 5c-5 0-9.3 3-11 7 1.7 4 6 7 11 7s9.3-3 11-7c-1.7-4-6-7-11-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg></button></div><small class="field-error">Kata sandi minimal 6 karakter.</small></div>
+          <label class="checkbox"><input type="checkbox" name="remember"><span></span>Ingat saya di perangkat ini</label>
+          <button class="button button-primary auth-submit" type="submit"><span>Masuk ke SIBATIG</span><b>→</b></button>
+        </form>
+        <p class="security-note"><svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3Zm-1 14-4-4 1.4-1.4 2.6 2.6 5.6-5.6L18 9l-7 7Z"/></svg>Koneksi Anda dilindungi dan dienkripsi.</p>
+      </div>
+      <footer class="auth-footer"><span>© 2026 SIBATIG</span><span><a href="#">Kebijakan Privasi</a><i>•</i><a href="#">Bantuan</a></span></footer>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"><span>✓</span><p></p></div><script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c3470">
+  <meta name="description" content="Dashboard Sistem Informasi Manajemen Pengawasan Irban Tiga">
+  <title>Dashboard | SIBATIG</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="app-page">
+  <a class="skip-link" href="#main-content">Lewati ke konten utama</a>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Navigasi utama">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40"><path d="M11 12.5h7v18h-7zM22 8h7v22.5h-7z"/><path class="mark-accent" d="M8 33h24v3H8zM12 8l8-4 8 4v2H12z"/></svg>
+        </div>
+        <div class="brand-copy"><strong>SIBATIG</strong><span>Irban Tiga</span></div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <p class="nav-label">Menu utama</p>
+        <a class="nav-item active" href="#dashboard" data-section-link="dashboard">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6v-9h-6v9Zm0-16v5h6V4h-6Z"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-item" href="#pkpt" data-section-link="pkpt">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10a2 2 0 0 1 2 2v16l-7-3-7 3V5a2 2 0 0 1 2-2Zm1 4v2h8V7H8Zm0 4v2h6v-2H8Z"/></svg>
+          <span>PKPT 2026</span><span class="nav-count">29</span>
+        </a>
+        <a class="nav-item" href="#monitoring" data-section-link="monitoring">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9h4v10H4Zm6 0V4h4v15h-4Zm6 0v-7h4v7h-4Z"/></svg>
+          <span>Monitoring &amp; Evaluasi</span>
+        </a>
+        <a class="nav-item" href="#spt" data-section-link="spt">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v15H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm8 2v5h4l-4-5ZM8 12v2h8v-2H8Zm0 4v2h8v-2H8Z"/></svg>
+          <span>Rekap SPT</span><span class="nav-count">30</span>
+        </a>
+        <a class="nav-item" href="#calendar" data-section-link="calendar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h2v2h6V2h2v2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2V2Zm12 8H5v10h14V10ZM5 8h14V6h-2v1h-2V6H9v1H7V6H5v2Z"/></svg>
+          <span>Kalender Kegiatan</span>
+        </a>
+        <a class="nav-item" href="#documents" data-section-link="documents">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4a2 2 0 0 1 2-2h5l2 3h5a2 2 0 0 1 2 2v2H4V4Zm0 7h17l-2 10H5L4 11Z"/></svg>
+          <span>Dokumen</span>
+        </a>
+
+        <p class="nav-label nav-label-spaced">Lainnya</p>
+        <a class="nav-item" href="#team" data-section-link="team">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm8-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM2 20a6 6 0 0 1 12 0H2Zm12.5 0a8 8 0 0 0-2.1-5.4A5 5 0 0 1 22 17v3h-7.5Z"/></svg>
+          <span>Tim Irban Tiga</span>
+        </a>
+        <a class="nav-item" href="#announcements" data-section-link="announcements">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Zm11-1v8a4 4 0 0 0 0-8Zm2-4v2a7 7 0 0 1 0 12v2a9 9 0 0 0 0-16Z"/></svg>
+          <span>Pengumuman</span><span class="notification-dot" aria-label="Ada pengumuman baru"></span>
+        </a>
+      </nav>
+
+      <div class="sidebar-help">
+        <div class="help-icon">?</div>
+        <div><strong>Butuh bantuan?</strong><span>Panduan penggunaan sistem</span></div>
+        <button class="icon-button small" type="button" aria-label="Buka panduan">→</button>
+      </div>
+      <div class="sidebar-footer">Inspektorat Daerah<br><span>Versi 1.0.0 · 2026</span></div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay" hidden></div>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-button" id="menuButton" type="button" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4V6Zm0 5h16v2H4v-2Zm0 5h16v2H4v-2Z"/></svg>
+          </button>
+          <div class="page-heading"><span>Selamat datang kembali,</span><strong>Dedi Haryadi</strong></div>
+        </div>
+        <div class="topbar-actions">
+          <label class="search-box" aria-label="Cari kegiatan atau dokumen">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m20 18.6-4.7-4.7a7 7 0 1 0-1.4 1.4l4.7 4.7 1.4-1.4ZM5 10a5 5 0 1 1 10 0 5 5 0 0 1-10 0Z"/></svg>
+            <input id="globalSearch" type="search" placeholder="Cari kegiatan..." autocomplete="off">
+            <kbd>⌘ K</kbd>
+          </label>
+          <div class="popover-wrap">
+            <button class="icon-button has-badge" id="notificationButton" type="button" aria-label="Notifikasi" aria-expanded="false">
+              <svg viewBox="0 0 24 24"><path d="M12 22a2.5 2.5 0 0 0 2.4-2h-4.8a2.5 2.5 0 0 0 2.4 2ZM5 17h14l-2-3v-4a5 5 0 0 0-4-4.9V3h-2v2.1A5 5 0 0 0 7 10v4l-2 3Z"/></svg><span class="badge">3</span>
+            </button>
+            <div class="popover notifications-popover" id="notificationsPopover" hidden>
+              <div class="popover-title"><strong>Notifikasi</strong><button type="button" class="text-button">Tandai dibaca</button></div>
+              <a href="#monitoring"><span class="notice-icon blue">↗</span><span><strong>Progres kegiatan diperbarui</strong><small>Audit Kinerja Kecamatan menjadi 68% · 10 menit lalu</small></span></a>
+              <a href="#documents"><span class="notice-icon amber">!</span><span><strong>Dokumen perlu ditinjau</strong><small>Laporan reviu menunggu persetujuan · 1 jam lalu</small></span></a>
+              <a href="#calendar"><span class="notice-icon green">✓</span><span><strong>Pengingat agenda</strong><small>Rapat ekspose dimulai besok · 2 jam lalu</small></span></a>
+            </div>
+          </div>
+          <div class="profile-wrap popover-wrap">
+            <button class="profile-button" id="profileButton" type="button" aria-label="Menu profil" aria-expanded="false">
+              <span class="avatar">DH</span><span class="profile-copy"><strong>Dedi Haryadi</strong><small>Inspektur Pembantu III</small></span>
+              <svg viewBox="0 0 24 24"><path d="m7 9 5 5 5-5H7Z"/></svg>
+            </button>
+            <div class="popover profile-popover" id="profilePopover" hidden>
+              <a href="#profile">Profil saya</a><a href="#settings">Pengaturan</a><hr><a href="login.html">Keluar</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main id="main-content">
+        <section class="dashboard-section view-section active" id="dashboard" data-section="dashboard">
+          <div class="hero-card">
+            <div class="hero-content">
+              <span class="eyebrow"><span class="live-dot"></span> Data terintegrasi PKPT–SPT</span>
+              <h1>Kinerja pengawasan,<br><em>dalam satu kendali.</em></h1>
+              <p>Pantau penerbitan SPT terhadap 29 kegiatan PKPT 2026 secara cepat, terukur, dan terdokumentasi.</p>
+              <div class="hero-actions"><a class="button button-light" href="#pkpt" data-section-link="pkpt">Lihat status PKPT <span>→</span></a><a class="button button-ghost" href="#spt" data-section-link="spt">Buka rekap SPT</a></div>
+            </div>
+            <div class="hero-visual" aria-hidden="true">
+              <div class="orb orb-one"></div><div class="orb orb-two"></div>
+              <div class="mini-dashboard">
+                <div class="mini-top"><span></span><span></span><span></span><b>PKPT</b></div>
+              <div class="mini-body"><div class="mini-ring"><span>38<small>%</small></span></div><div class="mini-bars"><i style="--h:28%"></i><i style="--h:42%"></i><i style="--h:52%"></i><i style="--h:70%"></i><i style="--h:84%"></i></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-intro">
+            <div><p class="overline">IKHTISAR PKPT &amp; SPT</p><h2>Kondisi terkini</h2></div>
+            <div class="date-pill"><svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2V2Zm12 8H5v10h14V10Z"/></svg><span>Selasa, 11 Agustus 2026</span></div>
+          </div>
+
+          <div class="stats-grid">
+            <article class="stat-card total"><div class="stat-head"><span class="stat-icon"><svg viewBox="0 0 24 24"><path d="M5 3h14v18H5V3Zm3 4v2h8V7H8Zm0 4v2h8v-2H8Zm0 4v2h5v-2H8Z"/></svg></span><span class="trend neutral">PKPT 2026</span></div><p>Total kegiatan</p><div><strong>29</strong><span>Penugasan PKPT</span></div></article>
+            <article class="stat-card pending"><div class="stat-head"><span class="stat-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 5v5.6l3.5 2.1-1 1.7-4.5-2.8V7h2Z"/></svg></span><span class="trend neutral">62,1%</span></div><p>Belum memiliki SPT</p><div><strong>18</strong><span>Kegiatan PKPT</span></div></article>
+            <article class="stat-card progress"><div class="stat-head"><span class="stat-icon"><svg viewBox="0 0 24 24"><path d="M12 2v10h10A10 10 0 1 1 12 2Zm2 0a10 10 0 0 1 8 8h-8V2Z"/></svg></span><span class="trend up">37,9%</span></div><p>Sudah memiliki SPT</p><div><strong>11</strong><span>Dari 29 kegiatan</span></div></article>
+            <article class="stat-card complete"><div class="stat-head"><span class="stat-icon"><svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2Z"/></svg></span><span class="trend up">29 selesai</span></div><p>SPT tercatat</p><div><strong>30</strong><span>1 masih berjalan</span></div></article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel progress-panel">
+              <div class="panel-header"><div><p class="overline">CAKUPAN PENERBITAN</p><h3>SPT terhadap PKPT 2026</h3></div><a href="#pkpt" data-section-link="pkpt">Lihat detail</a></div>
+              <div class="progress-overview">
+                <div class="donut" style="--value:38"><div><strong>38%</strong><span>Memiliki SPT</span></div></div>
+                <div class="progress-summary"><strong>11 dari 29 kegiatan</strong><p>sudah memiliki satu atau lebih SPT</p><div class="legend"><span><i class="legend-blue"></i>Sudah ada SPT <b>38%</b></span><span><i class="legend-light"></i>Belum ada SPT <b>62%</b></span></div></div>
+              </div>
+              <div class="monthly-chart" aria-label="Grafik progres Januari hingga Agustus">
+                <div class="chart-guides"><span>100</span><span>75</span><span>50</span><span>25</span><span>0</span></div>
+                <div class="chart-bars">
+                  <div><i style="--value:14%"><b>14%</b></i><span>Jan</span></div><div><i style="--value:21%"><b>21%</b></i><span>Feb</span></div><div><i style="--value:21%"><b>21%</b></i><span>Mar</span></div><div><i style="--value:24%"><b>24%</b></i><span>Apr</span></div><div><i style="--value:24%"><b>24%</b></i><span>Mei</span></div><div><i style="--value:31%"><b>31%</b></i><span>Jun</span></div><div><i style="--value:38%"><b>38%</b></i><span>Jul</span></div><div class="current"><i style="--value:38%"><b>38%</b></i><span>Agu</span></div>
+                </div>
+              </div>
+            </article>
+
+            <article class="panel agenda-panel composition-panel">
+              <div class="panel-header"><div><p class="overline">KOMPOSISI PROGRAM</p><h3>PKPT berdasarkan jenis</h3></div><a href="#pkpt" data-section-link="pkpt">29 kegiatan</a></div>
+              <div class="composition-list" aria-label="Komposisi kegiatan PKPT 2026">
+                <div><span><i class="composition-dot audit"></i>Audit <b>5</b></span><div><i class="audit" style="width:17.2%"></i></div><small>17,2%</small></div>
+                <div><span><i class="composition-dot reviu"></i>Reviu <b>12</b></span><div><i class="reviu" style="width:41.4%"></i></div><small>41,4%</small></div>
+                <div><span><i class="composition-dot monitoring"></i>Monitoring <b>3</b></span><div><i class="monitoring" style="width:10.3%"></i></div><small>10,3%</small></div>
+                <div><span><i class="composition-dot evaluasi"></i>Evaluasi <b>2</b></span><div><i class="evaluasi" style="width:6.9%"></i></div><small>6,9%</small></div>
+                <div><span><i class="composition-dot pendampingan"></i>Pendampingan <b>2</b></span><div><i class="pendampingan" style="width:6.9%"></i></div><small>6,9%</small></div>
+                <div><span><i class="composition-dot mandatory"></i>Mandatory <b>5</b></span><div><i class="mandatory" style="width:17.2%"></i></div><small>17,2%</small></div>
+              </div>
+              <div class="composition-footer"><span>Kelompok terbesar</span><strong>Reviu · 12 kegiatan</strong></div>
+            </article>
+          </div>
+
+          <article class="panel activity-panel">
+            <div class="panel-header"><div><p class="overline">INTEGRASI PKPT–SPT</p><h3>Realisasi SPT terbaru</h3></div><div class="filter-group" role="group" aria-label="Filter realisasi SPT"><button class="filter-button active" data-filter="all">Semua</button><button class="filter-button" data-filter="selesai">Selesai</button><button class="filter-button" data-filter="progress">On progress</button><button class="filter-button" data-filter="verifikasi">Perlu verifikasi</button></div></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Kegiatan PKPT</th><th>Jenis</th><th>SPT terkait</th><th>SPT terakhir</th><th>Status</th><th aria-label="Aksi"></th></tr></thead>
+                <tbody id="activityRows">
+                  <tr data-status="progress"><td><div class="activity-name"><span class="activity-code purple">34</span><div><strong>Reviu HPS</strong><small>PKPT No. 34 · Pemerintah Daerah Kota Kediri</small></div></div></td><td><span class="type-badge reviu">Reviu</span></td><td><a class="dashboard-spt-count" href="#spt" data-section-link="spt"><strong>2 SPT</strong><small>1 selesai · 1 berjalan</small></a></td><td><strong>30 Jul 2026</strong><small>700.1.2/906/419.060/2026</small></td><td><span class="integration-status progress"><i></i>On progress</span></td><td><a class="row-arrow" href="#pkpt" data-section-link="pkpt" aria-label="Lihat PKPT nomor 34">→</a></td></tr>
+                  <tr data-status="selesai"><td><div class="activity-name"><span class="activity-code green">31</span><div><strong>Reviu atas SSH dan ASB</strong><small>PKPT No. 31 · Pemerintah Daerah Kota Kediri</small></div></div></td><td><span class="type-badge reviu">Reviu</span></td><td><a class="dashboard-spt-count" href="#spt" data-section-link="spt"><strong>2 SPT</strong><small>Seluruhnya selesai</small></a></td><td><strong>22 Jul 2026</strong><small>700.1.2/864/419.060/2026</small></td><td><span class="integration-status complete"><i></i>Selesai</span></td><td><a class="row-arrow" href="#pkpt" data-section-link="pkpt" aria-label="Lihat PKPT nomor 31">→</a></td></tr>
+                  <tr data-status="selesai"><td><div class="activity-name"><span class="activity-code green">29</span><div><strong>Reviu RKPD-P</strong><small>PKPT No. 29 · Pemerintah Daerah Kota Kediri</small></div></div></td><td><span class="type-badge reviu">Reviu</span></td><td><a class="dashboard-spt-count" href="#spt" data-section-link="spt"><strong>1 SPT</strong><small>Selesai</small></a></td><td><strong>14 Jul 2026</strong><small>700.1.2/821/419.060/2026</small></td><td><span class="integration-status complete"><i></i>Selesai</span></td><td><a class="row-arrow" href="#pkpt" data-section-link="pkpt" aria-label="Lihat PKPT nomor 29">→</a></td></tr>
+                  <tr data-status="selesai"><td><div class="activity-name"><span class="activity-code green">50</span><div><strong>Maturitas SPIP</strong><small>PKPT No. 50 · Pemerintah Daerah Kota Kediri</small></div></div></td><td><span class="type-badge mandatory">Mandatory</span></td><td><a class="dashboard-spt-count" href="#spt" data-section-link="spt"><strong>2 SPT</strong><small>Seluruhnya selesai</small></a></td><td><strong>03 Jul 2026</strong><small>700.1.2/771/419.060/2026</small></td><td><span class="integration-status complete"><i></i>Selesai</span></td><td><a class="row-arrow" href="#pkpt" data-section-link="pkpt" aria-label="Lihat PKPT nomor 50">→</a></td></tr>
+                  <tr data-status="verifikasi"><td><div class="activity-name"><span class="activity-code amber">33</span><div><strong>Reviu E-Audit PBJ</strong><small>PKPT No. 33 · Pemerintah Daerah Kota Kediri</small></div></div></td><td><span class="type-badge reviu">Reviu</span></td><td><a class="dashboard-spt-count" href="#spt" data-section-link="spt"><strong>3 SPT</strong><small>Pemetaan kontekstual</small></a></td><td><strong>01 Jul 2026</strong><small>700.1.2/752/419.060/2026</small></td><td><span class="integration-status review"><i></i>Perlu verifikasi</span></td><td><a class="row-arrow" href="#pkpt" data-section-link="pkpt" aria-label="Lihat PKPT nomor 33">→</a></td></tr>
+                  <tr data-status="selesai"><td><div class="activity-name"><span class="activity-code green">28</span><div><strong>Reviu RKPD</strong><small>PKPT No. 28 · Pemerintah Daerah Kota Kediri</small></div></div></td><td><span class="type-badge reviu">Reviu</span></td><td><a class="dashboard-spt-count" href="#spt" data-section-link="spt"><strong>1 SPT</strong><small>Selesai</small></a></td><td><strong>22 Jun 2026</strong><small>700.1.2/693/419.060/2026</small></td><td><span class="integration-status complete"><i></i>Selesai</span></td><td><a class="row-arrow" href="#pkpt" data-section-link="pkpt" aria-label="Lihat PKPT nomor 28">→</a></td></tr>
+                </tbody>
+              </table>
+              <div class="empty-state" id="emptyState" hidden><strong>Tidak ada kegiatan ditemukan</strong><span>Coba gunakan kata kunci atau filter lain.</span></div>
+            </div>
+            <div class="panel-footer"><span>Menampilkan <strong id="visibleCount">6</strong> dari 11 kegiatan yang sudah memiliki SPT</span><a href="#pkpt" data-section-link="pkpt">Lihat seluruh integrasi <span>→</span></a></div>
+          </article>
+        </section>
+
+        <section class="view-section page-section" id="pkpt" data-section="pkpt">
+          <div class="page-title">
+            <div><p class="overline">PROGRAM KERJA PENGAWASAN TAHUNAN</p><h1>PKPT Irban Tiga 2026</h1><p>Daftar penugasan pengawasan sesuai dokumen PKPT tahun 2026.</p></div>
+            <div class="page-actions"><button class="button button-secondary" id="exportPkpt" type="button">↓ Ekspor CSV</button><button class="button button-primary" data-modal-open="activityModal">+ Tambah kegiatan</button></div>
+          </div>
+          <div class="stats-grid compact pkpt-stats"><article class="stat-card total"><p>Total PKPT</p><strong>29</strong></article><article class="stat-card complete"><p>Sudah ada SPT</p><strong>11</strong></article><article class="stat-card pending"><p>Belum ada SPT</p><strong>18</strong></article><article class="stat-card progress"><p>SPT on progress</p><strong>01</strong></article></div>
+
+          <article class="panel pkpt-panel">
+            <div class="pkpt-toolbar">
+              <label class="pkpt-search" for="pkptSearch"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m20 18.6-4.7-4.7a7 7 0 1 0-1.4 1.4l4.7 4.7 1.4-1.4ZM5 10a5 5 0 1 1 10 0 5 5 0 0 1-10 0Z"/></svg><input id="pkptSearch" type="search" placeholder="Cari penugasan, obrik, atau pelaksana..." autocomplete="off"></label>
+              <div class="pkpt-filters" role="group" aria-label="Filter jenis penugasan">
+                <button class="pkpt-filter active" type="button" data-pkpt-filter="all">Semua <span>29</span></button>
+                <button class="pkpt-filter" type="button" data-pkpt-filter="audit">Audit <span>5</span></button>
+                <button class="pkpt-filter" type="button" data-pkpt-filter="reviu">Reviu <span>12</span></button>
+                <button class="pkpt-filter" type="button" data-pkpt-filter="monitoring">Monitoring <span>3</span></button>
+                <button class="pkpt-filter" type="button" data-pkpt-filter="evaluasi">Evaluasi <span>2</span></button>
+                <button class="pkpt-filter" type="button" data-pkpt-filter="pendampingan">Pendampingan <span>2</span></button>
+                <button class="pkpt-filter" type="button" data-pkpt-filter="mandatory">Mandatory <span>5</span></button>
+              </div>
+            </div>
+            <div class="pkpt-source"><span class="live-dot"></span><strong>Data terintegrasi</strong><span>PKPT IRBAN 3 OK.xlsx + REKAP SPT saja irban 3.xlsx</span></div>
+            <div class="pkpt-status-tabs" role="group" aria-label="Filter realisasi SPT">
+              <span>Status SPT:</span><button class="pkpt-spt-filter active" type="button" data-pkpt-spt="all">Semua <b>29</b></button><button class="pkpt-spt-filter" type="button" data-pkpt-spt="yes">Sudah <b>11</b></button><button class="pkpt-spt-filter" type="button" data-pkpt-spt="no">Belum <b>18</b></button>
+              <small><i></i> Kecocokan kontekstual ditandai untuk verifikasi</small>
+            </div>
+            <div class="table-wrap pkpt-table-wrap">
+              <table class="pkpt-table">
+                <thead><tr><th>No.</th><th>Jenis penugasan</th><th>Penugasan</th><th>Realisasi SPT</th><th>Status</th><th>Obrik</th><th>Pelaksana/Pengampu</th><th>APIP</th></tr></thead>
+                <tbody id="pkptRows">
+                  <tr data-category="audit"><td><span class="pkpt-number">1</span></td><td><span class="type-badge audit">Audit Kinerja</span></td><td><strong>Audit Program pengelolaan dan pengembangan sistem drainase</strong></td><td>DPUPR, Dinas Perkim</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">7</span></td></tr>
+                  <tr data-category="audit"><td><span class="pkpt-number">4</span></td><td><span class="type-badge audit">Audit Ketaatan</span></td><td><strong>Audit Program perencanaan, pengendalian dan evaluasi pembangunan daerah</strong></td><td>Badan Perencanaan Pembangunan Daerah</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">20</span></td></tr>
+                  <tr data-category="audit"><td><span class="pkpt-number">7</span></td><td><span class="type-badge audit">Audit Dengan Tujuan Tertentu</span></td><td><strong>Audit Pekerjaan Fisik Proyek Strategis</strong></td><td>DPUPR</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">7</span></td></tr>
+                  <tr data-category="audit"><td><span class="pkpt-number">8</span></td><td><span class="type-badge audit">Audit Dengan Tujuan Tertentu</span></td><td><strong>Audit Program Pemberdayaan Masyarakat Desa dan Kelurahan</strong></td><td>Kecamatan Kota</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">7</span></td></tr>
+                  <tr data-category="audit"><td><span class="pkpt-number">9</span></td><td><span class="type-badge audit">Probity Audit</span></td><td><strong>Program/Kegiatan sebagaimana yang tercantum dalam SK Walikota tentang Proyek Strategis Pemerintah Kota Kediri Tahun 2026</strong></td><td>OPD sebagaimana yang tertuang dalam SK Proyek Strategis Pemerintah Kota Kediri Tahun 2026</td><td><span class="executor shared">IRBAN I, II, III</span></td><td><span class="apip-number">21</span></td></tr>
+
+                  <tr data-category="reviu"><td><span class="pkpt-number">13</span></td><td><span class="type-badge reviu">Reviu</span></td><td><strong>Reviu RKA Tahun 2027</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor shared">IRBAN I, II, III</span></td><td><span class="apip-number">21</span></td></tr>
+                  <tr data-category="reviu"><td><span class="pkpt-number">14</span></td><td><span class="type-badge reviu">Reviu</span></td><td><strong>Reviu RKA Perubahan Tahun 2026</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor shared">IRBAN I, II, III</span></td><td><span class="apip-number">21</span></td></tr>
+                  <tr data-category="reviu"><td><span class="pkpt-number">21</span></td><td><span class="type-badge reviu">Reviu</span></td><td><strong>Reviu Register Risiko Tahun 2026</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor shared">IRBAN I, II, III</span></td><td><span class="apip-number">21</span></td></tr>
+                  <tr data-category="reviu"><td><span class="pkpt-number">22</span></td><td><span class="type-badge reviu">Reviu</span></td><td><strong>Reviu PKPT Tahun 2026</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">10</span></td></tr>
+                  <tr data-category="reviu"><td><span class="pkpt-number">27</span></td><td><span class="type-badge reviu">Reviu</span></td><td><strong>Reviu Renja</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">7</span></td></tr>
+                  <tr data-category="reviu"><td><span class="pkpt-number">28</span></td><td><span class="type-badge reviu">Reviu</span></td><td><strong>Reviu RKPD</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">7</span></td></tr>
+                  <tr data-category="reviu"><td><span class="pkpt-number">29</span></td><td><span class="type-badge reviu">Reviu</span></td><td><strong>Reviu RKPD-P</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">7</span></td></tr>
+                  <tr data-category="reviu"><td><span class="pkpt-number">30</span></td><td><span class="type-badge reviu">Reviu</span></td><td><strong>Pemeriksaan Atas Honorarium Tahun Sebelumnya / Reviu Atas Honorarium Tahun Berjalan dengan Nilai Honorarium Tertinggi</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">7</span></td></tr>
+                  <tr data-category="reviu"><td><span class="pkpt-number">31</span></td><td><span class="type-badge reviu">Reviu</span></td><td><strong>Reviu atas SSH dan ASB</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">7</span></td></tr>
+                  <tr data-category="reviu"><td><span class="pkpt-number">32</span></td><td><span class="type-badge reviu">Reviu</span></td><td><strong>Reviu DAK</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">7</span></td></tr>
+                  <tr data-category="reviu"><td><span class="pkpt-number">33</span></td><td><span class="type-badge reviu">Reviu</span></td><td><strong>Reviu E-Audit PBJ</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">7</span></td></tr>
+                  <tr data-category="reviu"><td><span class="pkpt-number">34</span></td><td><span class="type-badge reviu">Reviu</span></td><td><strong>Reviu HPS</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">7</span></td></tr>
+
+                  <tr data-category="monitoring"><td><span class="pkpt-number">36</span></td><td><span class="type-badge monitoring">Monitoring</span></td><td><strong>Pendampingan pemantauan Mewujudkan ketahanan pangan nasional</strong></td><td>DKPP</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">7</span></td></tr>
+                  <tr data-category="monitoring"><td><span class="pkpt-number">37</span></td><td><span class="type-badge monitoring">Monitoring</span></td><td><strong>Pendampingan pemantauan Optimalisasi Pelaksanaan Pengentasan Kemiskinan dan Penghapusan Kemiskinan Ekstrem</strong></td><td>Pemerintah Kota Kediri</td><td><span class="executor shared">IRBAN I, II, III</span></td><td><span class="apip-number">21</span></td></tr>
+                  <tr data-category="monitoring"><td><span class="pkpt-number">39</span></td><td><span class="type-badge monitoring">Monitoring</span></td><td><strong>Pendampingan pemantauan Makan Bergizi Gratis</strong></td><td>Pemerintah Kota Kediri</td><td><span class="executor shared">IRBAN I, II, III</span></td><td><span class="apip-number">21</span></td></tr>
+
+                  <tr data-category="evaluasi"><td><span class="pkpt-number">44</span></td><td><span class="type-badge evaluasi">Evaluasi</span></td><td><strong>Evaluasi Register Risiko Tahun 2025</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor shared">IRBAN I, II, III</span></td><td><span class="apip-number">21</span></td></tr>
+                  <tr data-category="evaluasi"><td><span class="pkpt-number">47</span></td><td><span class="type-badge evaluasi">Evaluasi</span></td><td><strong>Evaluasi SAKIP Tahun 2026</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor shared">IRBAN I, II, III</span></td><td><span class="apip-number">7</span></td></tr>
+
+                  <tr data-category="pendampingan"><td><span class="pkpt-number">48</span></td><td><span class="type-badge pendampingan">Pendampingan</span></td><td><strong>Pendampingan Dana BOS Dinas Pendidikan Tahap II Tahun 2025</strong></td><td>Dinas Pendidikan</td><td><span class="executor shared">IRBAN I, II, III</span></td><td><span class="apip-number">7</span></td></tr>
+                  <tr data-category="pendampingan"><td><span class="pkpt-number">49</span></td><td><span class="type-badge pendampingan">Pendampingan</span></td><td><strong>Pendampingan Dana BOS Dinas Pendidikan Tahap I Tahun 2026</strong></td><td>Dinas Pendidikan</td><td><span class="executor shared">IRBAN I, II, III</span></td><td><span class="apip-number">7</span></td></tr>
+
+                  <tr data-category="mandatory"><td><span class="pkpt-number">50</span></td><td><span class="type-badge mandatory">Mandatory</span></td><td><strong>Maturitas SPIP</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">7</span></td></tr>
+                  <tr data-category="mandatory"><td><span class="pkpt-number">51</span></td><td><span class="type-badge mandatory">Mandatory</span></td><td><strong>Penilaian Mandiri Kapabilitas APIP</strong></td><td>Pemerintah Kota Kediri</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">7</span></td></tr>
+                  <tr data-category="mandatory"><td><span class="pkpt-number">52</span></td><td><span class="type-badge mandatory">Mandatory</span></td><td><strong>Fasilitasi Manajemen Risiko</strong></td><td>Pemerintah Daerah Kota Kediri</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">10</span></td></tr>
+                  <tr data-category="mandatory"><td><span class="pkpt-number">53</span></td><td><span class="type-badge mandatory">Mandatory</span></td><td><strong>PPBR Tahun 2027</strong></td><td>—</td><td><span class="executor">IRBAN III</span></td><td><span class="apip-number">12</span></td></tr>
+                  <tr data-category="mandatory"><td><span class="pkpt-number">59</span></td><td><span class="type-badge mandatory">Mandatory</span></td><td><strong>Penyusunan PKPT 2027</strong></td><td>—</td><td><span class="executor shared">IRBAN I, II, III</span></td><td><span class="apip-number">27</span></td></tr>
+                </tbody>
+              </table>
+              <div class="empty-state pkpt-empty" id="pkptEmpty" hidden><strong>Data PKPT tidak ditemukan</strong><span>Coba ubah kata kunci atau pilih kategori lainnya.</span></div>
+            </div>
+            <div class="panel-footer pkpt-footer"><span>Menampilkan <strong id="pkptVisibleCount">29</strong> dari 29 penugasan</span><span>Terakhir diperbarui · 11 Agustus 2026</span></div>
+          </article>
+        </section>
+        <section class="view-section page-section" id="spt" data-section="spt">
+          <div class="page-title"><div><p class="overline">SURAT PERINTAH TUGAS</p><h1>Rekap SPT Irban Tiga</h1><p>Rekap penerbitan dan pelaksanaan SPT Januari–Agustus 2026.</p></div><button class="button button-secondary" id="exportSpt" type="button">↓ Ekspor CSV</button></div>
+          <div class="stats-grid compact spt-stats"><article class="stat-card total"><p>Total SPT</p><strong>30</strong></article><article class="stat-card progress"><p>SPT terkait PKPT</p><strong>23</strong></article><article class="stat-card pending"><p>SPT non-PKPT</p><strong>07</strong></article><article class="stat-card complete"><p>Selesai / On progress</p><strong>29 / 1</strong></article></div>
+          <div class="integration-banner"><span class="integration-icon">↔</span><div><strong>Integrasi PKPT–SPT aktif</strong><p>23 SPT PKPT dipetakan ke 11 kegiatan unik. SPT lanjutan atau tahapan kegiatan digabung pada kegiatan PKPT yang sama.</p></div><a href="#pkpt" data-section-link="pkpt">Lihat status PKPT →</a></div>
+          <article class="panel spt-panel">
+            <div class="pkpt-toolbar spt-toolbar">
+              <label class="pkpt-search" for="sptSearch"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m20 18.6-4.7-4.7a7 7 0 1 0-1.4 1.4l4.7 4.7 1.4-1.4ZM5 10a5 5 0 1 1 10 0 5 5 0 0 1-10 0Z"/></svg><input id="sptSearch" type="search" placeholder="Cari nomor SPT, perihal, atau obrik..." autocomplete="off"></label>
+              <div class="pkpt-filters" role="group" aria-label="Filter data SPT"><button class="spt-filter active" type="button" data-spt-filter="all">Semua <span>30</span></button><button class="spt-filter" type="button" data-spt-filter="pkpt">PKPT <span>23</span></button><button class="spt-filter" type="button" data-spt-filter="non-pkpt">Non-PKPT <span>7</span></button><button class="spt-filter" type="button" data-spt-filter="progress">On progress <span>1</span></button></div>
+            </div>
+            <div class="spt-note"><span>i</span><p>Seluruh tanggal administrasi SPT ditampilkan untuk periode tahun 2026. Tahun lain pada uraian penugasan menunjukkan tahun anggaran atau objek pemeriksaan.</p></div>
+            <div class="table-wrap spt-table-wrap"><table class="spt-table"><thead><tr><th>No.</th><th>Nomor &amp; tanggal SPT</th><th>Perihal / obrik</th><th>Rencana pemeriksaan</th><th>LHP/LHR</th><th>Jenis</th><th>Keterkaitan</th><th>Status</th></tr></thead><tbody id="sptRows"></tbody></table><div class="empty-state" id="sptEmpty" hidden><strong>Data SPT tidak ditemukan</strong><span>Coba ubah pencarian atau filter.</span></div></div>
+            <div class="panel-footer"><span>Menampilkan <strong id="sptVisibleCount">30</strong> dari 30 SPT</span><span>Sumber · REKAP SPT saja irban 3.xlsx</span></div>
+          </article>
+        </section>
+        <section class="view-section page-section" id="monitoring" data-section="monitoring"><div class="page-title"><div><p class="overline">KENDALI PELAKSANAAN</p><h1>Monitoring &amp; Evaluasi</h1><p>Pantau realisasi SPT terhadap seluruh kegiatan PKPT.</p></div></div><article class="panel placeholder-panel"><div class="donut small" style="--value:38"><div><strong>38%</strong></div></div><h2>11 kegiatan sudah memiliki SPT</h2><p>18 kegiatan PKPT belum memiliki SPT. Dari 30 SPT yang tercatat, 29 selesai dan satu masih berjalan.</p><a class="button button-primary" href="#pkpt" data-section-link="pkpt">Lihat pemetaan PKPT–SPT</a></article></section>
+        <section class="view-section page-section" id="calendar" data-section="calendar">
+          <div class="page-title"><div><p class="overline">JADWAL SPT TAHUN 2026</p><h1>Kalender Kegiatan</h1><p>Periode berlangsungnya pemeriksaan berdasarkan rencana mulai dan akhir pada Rekap SPT.</p></div><a class="button button-secondary" href="#spt" data-section-link="spt">Lihat Rekap SPT</a></div>
+          <div class="stats-grid compact calendar-stats"><article class="stat-card total"><p>Total SPT 2026</p><strong>30</strong></article><article class="stat-card complete"><p>Selesai</p><strong>29</strong></article><article class="stat-card progress"><p>On progress</p><strong>01</strong></article><article class="stat-card pending"><p>Periode data</p><strong>Jan–Agu</strong></article></div>
+          <article class="panel calendar-panel">
+            <div class="calendar-toolbar">
+              <div class="calendar-navigation"><button id="calendarPrev" type="button" aria-label="Bulan sebelumnya">←</button><div><p class="overline">PERIODE KALENDER</p><strong id="calendarTitle">Agustus 2026</strong></div><button id="calendarNext" type="button" aria-label="Bulan berikutnya">→</button></div>
+              <div class="calendar-selectors"><label for="calendarMonth">Bulan</label><select id="calendarMonth"><option value="0">Januari</option><option value="1">Februari</option><option value="2">Maret</option><option value="3">April</option><option value="4">Mei</option><option value="5">Juni</option><option value="6">Juli</option><option value="7" selected>Agustus</option><option value="8">September</option><option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option></select><label for="calendarYear">Tahun</label><select id="calendarYear"><option>2026</option></select></div>
+            </div>
+            <div class="calendar-legend"><span><i class="audit"></i>Audit</span><span><i class="reviu"></i>Reviu</span><span><i class="pendampingan"></i>Pendampingan</span><span><i class="mandatory"></i>Mandatory</span><small>Klik tanggal untuk melihat SPT yang berlangsung</small></div>
+            <div class="calendar-layout">
+              <div class="calendar-main"><div class="calendar-grid interactive-calendar" id="calendarGrid" aria-live="polite"></div></div>
+              <aside class="calendar-agenda" aria-label="Daftar SPT pada periode terpilih"><div class="calendar-agenda-head"><div><p class="overline">AGENDA PEMERIKSAAN</p><h2 id="calendarAgendaTitle">SPT Agustus 2026</h2></div><span id="calendarEventCount">1 SPT</span></div><div class="calendar-event-list" id="calendarEventList"></div></aside>
+            </div>
+          </article>
+        </section>
+        <section class="view-section page-section" id="documents" data-section="documents"><div class="page-title"><div><p class="overline">ARSIP DIGITAL</p><h1>Dokumen</h1><p>Temukan surat tugas, kertas kerja, data pendukung, dan laporan.</p></div><button class="button button-primary" data-toast="Fitur unggah siap diintegrasikan dengan server">↑ Unggah dokumen</button></div><div class="document-grid"><article class="document-card"><span>ST</span><div><strong>Surat Tugas</strong><small>18 dokumen</small></div></article><article class="document-card"><span>KK</span><div><strong>Kertas Kerja</strong><small>42 dokumen</small></div></article><article class="document-card"><span>DP</span><div><strong>Data Pendukung</strong><small>67 dokumen</small></div></article><article class="document-card"><span>LP</span><div><strong>Laporan</strong><small>12 dokumen</small></div></article></div></section>
+        <section class="view-section page-section" id="team" data-section="team">
+          <div class="page-title"><div><p class="overline">ORGANISASI</p><h1>Tim Irban Tiga</h1><p>Susunan personel pelaksana pengawasan tahun 2026 · 7 anggota.</p></div></div>
+          <div class="team-grid">
+            <article class="team-card team-lead"><span class="avatar large">DH</span><span class="team-badge">Pimpinan</span><strong>Dedi Haryadi, S.H., M.M.</strong><span class="team-role">Inspektur Pembantu III</span><small>Pembina Tk. I (IV/b)</small><span class="team-nip"><b>NIP</b> 19731209 200112 1 004</span></article>
+            <article class="team-card"><span class="avatar large purple-bg">SM</span><strong>Sri Mulyani, S.E., M.M.</strong><span class="team-role">PPUPD Ahli Madya</span><small>Pembina Tk. I (IV/b)</small><span class="team-nip"><b>NIP</b> 19740804 199901 2 001</span></article>
+            <article class="team-card"><span class="avatar large green-bg">BB</span><strong>Bram Brahmana, S.T.</strong><span class="team-role">Auditor Ahli Muda</span><small>Penata Tk. I (III/d)</small><span class="team-nip"><b>NIP</b> 19860517 201001 1 009</span></article>
+            <article class="team-card"><span class="avatar large amber-bg">DY</span><strong>Dwi Yunianto, S.E., M.M.</strong><span class="team-role">PPUPD Ahli Madya</span><small>Pembina Utama Muda (IV/c)</small><span class="team-nip"><b>NIP</b> 19760124 200112 1 004</span></article>
+            <article class="team-card"><span class="avatar large cyan-bg">WW</span><strong>Wawan Wicaksono, S.T.</strong><span class="team-role">PPUPD Ahli Muda</span><small>Penata Tk. I (III/d)</small><span class="team-nip"><b>NIP</b> 19791110 200112 1 002</span></article>
+            <article class="team-card"><span class="avatar large rose-bg">AK</span><strong>Anik Kusmianingsih, S.Pd. Kim.</strong><span class="team-role">Auditor Ahli Muda</span><small>Penata (III/c)</small><span class="team-nip"><b>NIP</b> 19791210 200901 2 004</span></article>
+            <article class="team-card"><span class="avatar large slate-bg">DA</span><strong>Dani Angga Setyantono, S.T.</strong><span class="team-role">Auditor Ahli Pertama</span><small>Penata Muda (III/a)</small><span class="team-nip"><b>NIP</b> 19970629 202504 1 001</span></article>
+          </div>
+        </section>
+        <section class="view-section page-section" id="announcements" data-section="announcements"><div class="page-title"><div><p class="overline">INFORMASI INTERNAL</p><h1>Pengumuman</h1><p>Informasi dan pembaruan terbaru untuk tim Irban Tiga.</p></div></div><article class="panel announcement-list"><div><span class="notice-icon blue">i</span><p><strong>Pemutakhiran data PKPT Agustus</strong><small>Seluruh ketua tim diminta memperbarui progres paling lambat 14 Agustus 2026.</small></p><time>Hari ini</time></div><div><span class="notice-icon amber">!</span><p><strong>Jadwal ekspose hasil reviu</strong><small>Ekspose dilaksanakan pada Jumat, 15 Agustus di Ruang Rapat Irban III.</small></p><time>8 Agu</time></div></article></section>
+      </main>
+      <footer class="app-footer"><span>© 2026 SIBATIG · Inspektorat Daerah</span><span>Integritas · Profesional · Akuntabel</span></footer>
+    </div>
+  </div>
+
+  <dialog class="modal" id="activityModal">
+    <form method="dialog" id="activityForm">
+      <div class="modal-header"><div><p class="overline">DATA PKPT</p><h2>Tambah kegiatan</h2></div><button class="icon-button" value="cancel" aria-label="Tutup">×</button></div>
+      <div class="form-field"><label for="activityName">Nama kegiatan</label><input id="activityName" required placeholder="Contoh: Audit Kinerja Kecamatan"></div>
+      <div class="form-row"><div class="form-field"><label for="activityType">Jenis pengawasan</label><select id="activityType"><option>Pemeriksaan</option><option>Reviu</option><option>Monitoring</option><option>Evaluasi</option></select></div><div class="form-field"><label for="activityLead">Ketua tim</label><input id="activityLead" required placeholder="Nama ketua tim"></div></div>
+      <div class="form-row"><div class="form-field"><label for="startDate">Mulai</label><input id="startDate" type="date" required></div><div class="form-field"><label for="endDate">Selesai</label><input id="endDate" type="date" required></div></div>
+      <div class="modal-actions"><button class="button button-secondary" value="cancel">Batal</button><button class="button button-primary" id="saveActivity" value="default">Simpan kegiatan</button></div>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"><span>✓</span><p></p></div>
+  <script src="spt-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
