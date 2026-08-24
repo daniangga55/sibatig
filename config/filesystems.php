@@ -1,5 +1,9 @@
 <?php
 
+use App\Support\GoogleDriveConfiguration;
+
+$googleDrive = GoogleDriveConfiguration::resolve();
+
 return [
 
     /*
@@ -55,12 +59,12 @@ return [
 
         'google' => [
             'driver' => 'google',
-            'client_id' => env('GOOGLE_DRIVE_CLIENT_ID'),
-            'client_secret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
-            'redirect_uri' => env('GOOGLE_DRIVE_REDIRECT_URI', 'http://127.0.0.1'),
-            'access_token' => env('GOOGLE_DRIVE_ACCESS_TOKEN'),
-            'refresh_token' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
-            'folder_id' => env('GOOGLE_DRIVE_FOLDER_ID'),
+            'client_id' => $googleDrive['client_id'],
+            'client_secret' => $googleDrive['client_secret'],
+            'redirect_uri' => $googleDrive['redirect_uri'],
+            'access_token' => $googleDrive['access_token'],
+            'refresh_token' => $googleDrive['refresh_token'],
+            'folder_id' => $googleDrive['folder_id'],
             'throw' => true,
             'report' => true,
         ],

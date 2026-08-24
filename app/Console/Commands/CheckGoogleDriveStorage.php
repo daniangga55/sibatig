@@ -33,7 +33,7 @@ class CheckGoogleDriveStorage extends Command
             }
 
             $this->newLine();
-            $this->line('Isi nilainya di .env, lalu jalankan `php artisan optimize:clear`.');
+            $this->line('Lengkapi file kredensial/token atau .env, lalu jalankan `php artisan optimize:clear`.');
 
             return self::FAILURE;
         }

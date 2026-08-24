@@ -1,58 +1,88 @@
 # Penyimpanan dokumen di Google Drive
 
-Integrasi ini hanya memindahkan lokasi **file dokumen**. Metadata, kategori, relasi SPT, nama file, ukuran, dan nama disk tetap disimpan pada tabel `documents` di MySQL.
+Google Drive menyimpan **file dokumen**, sedangkan metadata, kategori, relasi SPT, nama file, ukuran, dan nama disk tetap disimpan di tabel `documents` pada MySQL.
 
-## 1. Siapkan Google Cloud
+> Jangan menempel Client Secret, access token, refresh token, atau isi JSON OAuth ke dokumen ini maupun Git.
 
-1. Buat atau pilih project di Google Cloud Console.
-2. Aktifkan **Google Drive API**.
-3. Konfigurasikan OAuth consent screen.
-4. Buat OAuth Client ID dan simpan Client ID serta Client Secret.
-5. Dapatkan refresh token dengan scope `https://www.googleapis.com/auth/drive`.
-6. Buat folder khusus, misalnya `SIBATIG`, lalu salin ID folder dari URL Google Drive.
+## Status konfigurasi proyek
 
-Gunakan akun organisasi khusus aplikasi jika tersedia. Jangan memasukkan Client Secret atau refresh token ke Git.
+- Kredensial OAuth dibaca dari `storage/app/credentials/google-drive-oauth.json`.
+- Token OAuth disimpan otomatis di `storage/app/credentials/google-drive-token.json`.
+- Folder ID disimpan otomatis di `storage/app/credentials/google-drive-folder.json`.
+- Kedua file tersebut diabaikan Git melalui `.gitignore`.
+- Dokumen tetap menggunakan storage `local` sampai koneksi Google Drive berhasil diuji.
 
-## 2. Isi `.env`
+## 1. Konfigurasi Google Cloud
 
-Biarkan disk dokumen tetap `local` selama penyiapan:
+1. Aktifkan **Google Drive API** pada project Google Cloud.
+2. Konfigurasikan OAuth consent screen dan tambahkan akun yang dipakai sebagai test user jika aplikasi masih berstatus Testing.
+3. Pada OAuth Client bertipe **Web application**, tambahkan Authorized redirect URI berikut:
+
+   ```text
+   http://127.0.0.1:8000/admin/google-drive/oauth/callback
+   ```
+
+4. Aplikasi akan membuat folder `SIBATIG` secara otomatis setelah otorisasi berhasil.
+
+Client Secret pernah ditempel di dokumen proyek. Rotasi Client Secret di Google Cloud, unduh JSON OAuth yang baru, lalu ganti file lokal `storage/app/credentials/google-drive-oauth.json` sebelum melakukan otorisasi.
+
+## 2. Konfigurasi `.env`
 
 ```dotenv
 FILESYSTEM_DISK=local
 DOCUMENT_FILESYSTEM_DISK=local
 
-GOOGLE_DRIVE_CLIENT_ID=client-id-anda
-GOOGLE_DRIVE_CLIENT_SECRET=client-secret-anda
-GOOGLE_DRIVE_REDIRECT_URI=http://127.0.0.1
+GOOGLE_DRIVE_CREDENTIALS_PATH=storage/app/credentials/google-drive-oauth.json
+GOOGLE_DRIVE_TOKEN_PATH=storage/app/credentials/google-drive-token.json
+GOOGLE_DRIVE_FOLDER_PATH=storage/app/credentials/google-drive-folder.json
+GOOGLE_DRIVE_CLIENT_ID=
+GOOGLE_DRIVE_CLIENT_SECRET=
+GOOGLE_DRIVE_REDIRECT_URI=http://127.0.0.1:8000/admin/google-drive/oauth/callback
 GOOGLE_DRIVE_ACCESS_TOKEN=
-GOOGLE_DRIVE_REFRESH_TOKEN=refresh-token-anda
-GOOGLE_DRIVE_FOLDER_ID=id-folder-sibatig
+GOOGLE_DRIVE_REFRESH_TOKEN=
+GOOGLE_DRIVE_FOLDER_ID=
 GOOGLE_DRIVE_DEBUG=false
 GOOGLE_DRIVE_LOG_PAYLOAD=false
 ```
 
-Refresh token lebih sesuai untuk server dibanding access token sementara karena access token akan kedaluwarsa.
+Client ID dan Client Secret boleh dibiarkan kosong karena aplikasi membacanya dari file JSON. Folder ID juga boleh kosong karena aplikasi akan membuat folder `SIBATIG` dan menyimpan ID-nya secara otomatis.
 
-## 3. Migrasi dan uji koneksi
+## 3. Otorisasi akun Google
+
+1. Jalankan aplikasi pada `http://127.0.0.1:8000`.
+2. Masuk sebagai Super Admin.
+3. Buka URL berikut di browser:
+
+   ```text
+   http://127.0.0.1:8000/admin/google-drive/oauth/authorize
+   ```
+
+4. Pilih akun Google yang akan menjadi pemilik penyimpanan SIBATIG dan setujui akses.
+5. Google mengembalikan browser ke aplikasi. Refresh token serta Folder ID akan disimpan otomatis tanpa ditampilkan.
+6. Muat ulang konfigurasi:
+
+   ```powershell
+   php artisan optimize:clear
+   ```
+
+## 4. Uji koneksi
 
 ```powershell
-php artisan migrate
-php artisan optimize:clear
 php artisan sibatig:gdrive-check
 php artisan sibatig:gdrive-check --write
 ```
 
 Opsi `--write` membuat satu file pemeriksaan sementara, membacanya, lalu langsung menghapusnya.
 
-## 4. Aktifkan Google Drive
+## 5. Aktifkan Google Drive
 
-Setelah kedua pemeriksaan berhasil, ubah satu baris berikut:
+Hanya setelah kedua pemeriksaan berhasil, ubah:
 
 ```dotenv
 DOCUMENT_FILESYSTEM_DISK=google
 ```
 
-Kemudian muat ulang konfigurasi:
+Kemudian jalankan:
 
 ```powershell
 php artisan optimize:clear
@@ -60,11 +90,12 @@ php artisan optimize
 php artisan filament:optimize
 ```
 
-Dokumen baru akan masuk ke Google Drive. Record lama tetap memakai `storage_disk=local` dan masih dapat diunduh dari lokasi lama, sehingga perubahan ini tidak menghapus atau memutus data yang sudah ada.
+Dokumen baru akan masuk ke Google Drive. Record lama tetap memakai `storage_disk=local`, sehingga perubahan ini tidak menghapus atau memutus akses ke file yang sudah ada.
 
-## Catatan deployment
+## Deployment
 
-- Isi seluruh secret Google Drive melalui environment variables pada hosting, bukan di file yang di-commit.
-- Folder Google Drive harus dimiliki atau dibagikan kepada akun OAuth yang menghasilkan refresh token.
-- Cadangkan MySQL dan `storage/app/private/documents` sebelum memindahkan file lama.
-- Jangan menghapus folder lokal sampai seluruh file lama benar-benar sudah dimigrasikan dan diverifikasi.
+- Jangan commit isi `storage/app/credentials`.
+- Pada hosting, gunakan environment variables atau secret manager untuk kredensial dan token.
+- Tambahkan redirect URI HTTPS domain production ke OAuth Client Google Cloud.
+- Folder Drive harus dimiliki atau dibagikan kepada akun yang melakukan otorisasi.
+- Cadangkan MySQL dan `storage/app/private/documents` sebelum memigrasikan file lama.

@@ -14,6 +14,22 @@ class ExampleTest extends TestCase
     {
         $response = $this->get('/');
 
-        $response->assertRedirect('/admin');
+        $response
+            ->assertOk()
+            ->assertSee('SIBATIG')
+            ->assertSee('Pengelolaan kegiatan Irban 3')
+            ->assertSee(route('privacy-policy'), false);
+    }
+
+    public function test_google_verification_pages_are_publicly_accessible(): void
+    {
+        $this->get('/privacy-policy')
+            ->assertOk()
+            ->assertSee('Google User Data Disclosure')
+            ->assertSee('drive.file');
+
+        $this->get('/terms-of-service')
+            ->assertOk()
+            ->assertSee('Ketentuan penggunaan SIBATIG');
     }
 }
