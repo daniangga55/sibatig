@@ -17,7 +17,12 @@ class WebsiteSettingInfolist
                 Section::make('Profil website')
                     ->columns(3)
                     ->schema([
-                        ImageEntry::make('logo_path')->label('Logo')->disk('public')->circular()->placeholder('Belum ada logo'),
+                        ImageEntry::make('logo_preview')
+                            ->label('Logo aktif')
+                            ->state(fn (): string => asset('images/logo-irban-3.jpg').'?v=20260819')
+                            ->alt('Logo Irban 3')
+                            ->imageHeight(96)
+                            ->square(),
                         TextEntry::make('site_name')->label('Nama aplikasi'),
                         TextEntry::make('site_tagline')->label('Tagline')->placeholder('—'),
                         TextEntry::make('organization_name')->label('Organisasi')->columnSpan(2),

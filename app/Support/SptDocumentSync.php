@@ -29,6 +29,15 @@ final class SptDocumentSync
         return is_string($path) && filled($path) ? $path : null;
     }
 
+    public static function diskNameFor(?SptRecord $record): string
+    {
+        if (! $record) {
+            return DocumentStorage::defaultDisk();
+        }
+
+        return DocumentStorage::diskName(self::documentFor($record, withTrashed: true));
+    }
+
     public static function sync(SptRecord $record, ?string $path, ?string $originalName, ?int $uploaderId): void
     {
         $document = self::documentFor($record, withTrashed: true);
@@ -45,6 +54,7 @@ final class SptDocumentSync
             'year' => $record->year,
             'category' => DocumentCategory::Spt,
             'source' => self::SOURCE,
+            'storage_disk' => self::diskNameFor($record),
             'title' => "File SPT {$record->document_number}",
             'document_number' => $record->document_number,
             'document_date' => $record->document_date,

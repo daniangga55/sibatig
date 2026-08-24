@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Documents\Schemas;
 use App\Enums\DocumentCategory;
 use App\Models\Document;
 use App\Models\SptRecord;
+use App\Support\DocumentStorage;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -50,7 +51,7 @@ class DocumentForm
                         ->maxLength(255),
                     FileUpload::make('file_path')
                         ->label('Pilih file')
-                        ->disk('local')
+                        ->disk(fn (?Document $record): string => DocumentStorage::diskName($record))
                         ->directory(fn (Get $get): string => 'documents/'.($get('year') ?: 2026).'/'.(DocumentCategory::tryFrom((string) $get('category'))?->directory() ?? 'lainnya'))
                         ->visibility('private')
                         ->acceptedFileTypes([
@@ -66,6 +67,14 @@ class DocumentForm
                         ])
                         ->maxSize(20480)
                         ->storeFileNamesIn('original_name')
+                        ->previewable(false)
+                        ->downloadable()
+                        ->getUploadedFileUsing(
+                            fn (string $file, string|array|null $storedFileNames, ?Document $record): ?array => DocumentStorage::uploadedFileData($record, $file, $storedFileNames),
+                        )
+                        ->getDownloadableFileUrlUsing(
+                            fn (?Document $record): ?string => $record ? route('documents.download', $record) : null,
+                        )
                         ->required(fn (?Document $record): bool => $record === null)
                         ->helperText('PDF, Word, Excel, PowerPoint, JPG, atau PNG. Maksimal 20 MB.')
                         ->columnSpanFull(),

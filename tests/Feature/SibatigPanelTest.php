@@ -195,7 +195,11 @@ class SibatigPanelTest extends TestCase
     public function test_authentication_pages_and_dashboard_widgets_render(): void
     {
         auth()->logout();
-        $this->get('/admin/login')->assertOk()->assertSee('sibatig-auth-showcase', false);
+        $this->get('/admin/login')
+            ->assertOk()
+            ->assertSee('sibatig-auth-showcase', false)
+            ->assertSee('images/logo-irban-3.jpg?v=20260819', false)
+            ->assertDontSee('M11 12.5h7v18', false);
         $this->get('/admin/password-reset/request')->assertOk();
 
         $this->actingAs($this->admin)
@@ -204,6 +208,7 @@ class SibatigPanelTest extends TestCase
             ->assertSee('Kinerja pengawasan')
             ->assertSee('Selamat datang kembali')
             ->assertSee('sibatig-topbar-profile-copy', false)
+            ->assertSee('images/logo-irban-3.jpg?v=20260819', false)
             ->assertSee('sibatig-stats-grid', false)
             ->assertSee('INTEGRASI PKPT&ndash;MONITORING', false)
             ->assertSee('--sibatig-primary: #1769d2', false);
@@ -364,6 +369,7 @@ class SibatigPanelTest extends TestCase
 
         $this->assertSame($this->admin->id, $document->uploaded_by);
         $this->assertSame(DocumentCategory::Spt, $document->category);
+        $this->assertSame('local', $document->storage_disk);
         $this->assertSame('SPT-Pengujian.pdf', $document->original_name);
         $this->assertSame($spt->id, $document->spt_record_id);
         Storage::disk('local')->assertExists($document->file_path);
@@ -418,6 +424,7 @@ class SibatigPanelTest extends TestCase
             ->firstOrFail();
 
         $this->assertSame(DocumentCategory::Spt, $document->category);
+        $this->assertSame('local', $document->storage_disk);
         $this->assertSame($spt->document_number, $document->document_number);
         $this->assertSame('SPT-Utama.pdf', $document->original_name);
         $this->assertSame($this->admin->id, $document->uploaded_by);
@@ -445,6 +452,31 @@ class SibatigPanelTest extends TestCase
 
         $this->assertSoftDeleted('documents', ['id' => $document->id]);
         Storage::disk('local')->assertExists($document->file_path);
+    }
+
+    public function test_new_documents_follow_the_configured_document_disk(): void
+    {
+        config(['filesystems.documents' => 'google']);
+        Storage::fake('google');
+
+        $path = 'documents/2026/laporan/laporan-gdrive.pdf';
+        Storage::disk('google')->put($path, 'file laporan pengujian');
+
+        $document = Document::query()->create([
+            'year' => 2026,
+            'category' => DocumentCategory::Report,
+            'title' => 'Laporan pada Google Drive',
+            'file_path' => $path,
+            'original_name' => 'laporan-gdrive.pdf',
+            'uploaded_by' => $this->admin->id,
+        ]);
+
+        $this->assertSame('google', $document->storage_disk);
+        Storage::disk('google')->assertExists($document->file_path);
+
+        $this->get(route('documents.download', $document))
+            ->assertOk()
+            ->assertDownload('laporan-gdrive.pdf');
     }
 
     public function test_inactive_user_cannot_access_panel(): void

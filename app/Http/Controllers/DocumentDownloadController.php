@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Document;
+use App\Support\DocumentStorage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DocumentDownloadController extends Controller
@@ -15,9 +15,11 @@ class DocumentDownloadController extends Controller
     {
         $this->authorize('view', $document);
 
-        abort_unless(Storage::disk('local')->exists($document->file_path), 404, 'File dokumen tidak ditemukan.');
+        $disk = DocumentStorage::disk($document);
 
-        return Storage::disk('local')->download(
+        abort_unless($disk->exists($document->file_path), 404, 'File dokumen tidak ditemukan.');
+
+        return $disk->download(
             $document->file_path,
             $document->original_name,
             array_filter(['Content-Type' => $document->mime_type]),

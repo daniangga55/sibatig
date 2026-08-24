@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\WebsiteSettings\Schemas;
 
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -25,7 +25,13 @@ class WebsiteSettingForm
                         TextInput::make('site_tagline')->label('Tagline')->maxLength(255),
                         TextInput::make('organization_name')->label('Nama organisasi')->required()->maxLength(255)->columnSpanFull(),
                         Textarea::make('description')->label('Deskripsi')->rows(4)->columnSpanFull(),
-                        FileUpload::make('logo_path')->label('Logo')->image()->imageEditor()->disk('public')->directory('branding')->visibility('public')->columnSpanFull(),
+                        Placeholder::make('logo_preview')
+                            ->label('Logo aktif')
+                            ->content(fn (): \Illuminate\Support\HtmlString => new \Illuminate\Support\HtmlString(
+                                '<img src="'.e(asset('images/logo-irban-3.jpg').'?v=20260819').'" alt="Logo Irban 3" width="132" height="132" style="width:132px;height:132px;object-fit:contain;border-radius:16px;border:1px solid #e5e7eb;background:#fff">',
+                            ))
+                            ->helperText('Logo Irban 3 digunakan secara konsisten pada seluruh website.')
+                            ->columnSpanFull(),
                     ]),
                 Section::make('Tampilan dan regional')
                     ->columns(3)

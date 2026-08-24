@@ -16,6 +16,12 @@ return [
     'default' => env('FILESYSTEM_DISK', 'local'),
 
     /*
+    | Disk khusus dokumen SIBATIG. Pisahkan dari disk default Laravel agar
+    | cache, sesi, dan file internal aplikasi tidak ikut pindah ke Google Drive.
+    */
+    'documents' => env('DOCUMENT_FILESYSTEM_DISK', 'local'),
+
+    /*
     |--------------------------------------------------------------------------
     | Filesystem Disks
     |--------------------------------------------------------------------------
@@ -45,6 +51,18 @@ return [
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
+        ],
+
+        'google' => [
+            'driver' => 'google',
+            'client_id' => env('GOOGLE_DRIVE_CLIENT_ID'),
+            'client_secret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
+            'redirect_uri' => env('GOOGLE_DRIVE_REDIRECT_URI', 'http://127.0.0.1'),
+            'access_token' => env('GOOGLE_DRIVE_ACCESS_TOKEN'),
+            'refresh_token' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
+            'folder_id' => env('GOOGLE_DRIVE_FOLDER_ID'),
+            'throw' => true,
+            'report' => true,
         ],
 
         's3' => [

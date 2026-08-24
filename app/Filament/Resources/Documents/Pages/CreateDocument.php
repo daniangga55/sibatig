@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Documents\Pages;
 
 use App\Filament\Concerns\HasReliableCancelAction;
 use App\Filament\Resources\Documents\DocumentResource;
+use App\Support\DocumentStorage;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateDocument extends CreateRecord
@@ -15,6 +16,7 @@ class CreateDocument extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['uploaded_by'] = auth()->id();
+        $data['storage_disk'] = DocumentStorage::defaultDisk();
 
         return $data;
     }

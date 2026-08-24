@@ -5,6 +5,7 @@ namespace App\Filament\Resources\SptRecords\Schemas;
 use App\Models\PkptActivity;
 use App\Models\SptRecord;
 use App\Rules\WorkingDay;
+use App\Support\DocumentStorage;
 use App\Support\IndonesiaHolidayCalendar;
 use App\Support\SptDocumentSync;
 use Filament\Actions\Action;
@@ -109,7 +110,7 @@ class SptRecordForm
                         ->schema([
                             FileUpload::make('spt_file')
                                 ->label('Upload file SPT')
-                                ->disk('local')
+                                ->disk(fn (?SptRecord $record): string => SptDocumentSync::diskNameFor($record))
                                 ->directory('documents/2026/spt')
                                 ->visibility('private')
                                 ->acceptedFileTypes([
@@ -121,7 +122,20 @@ class SptRecordForm
                                 ])
                                 ->maxSize(20480)
                                 ->storeFileNamesIn('spt_file_original_name')
+                                ->previewable(false)
                                 ->downloadable()
+                                ->getUploadedFileUsing(function (string $file, string|array|null $storedFileNames, ?SptRecord $record): ?array {
+                                    return DocumentStorage::uploadedFileData(
+                                        $record ? SptDocumentSync::documentFor($record) : null,
+                                        $file,
+                                        $storedFileNames,
+                                    );
+                                })
+                                ->getDownloadableFileUrlUsing(function (?SptRecord $record): ?string {
+                                    $document = $record ? SptDocumentSync::documentFor($record) : null;
+
+                                    return $document ? route('documents.download', $document) : null;
+                                })
                                 ->preventFilePathTampering(
                                     allowFilePathUsing: fn (string $file, ?SptRecord $record): bool => $record?->documents()
                                         ->where('source', SptDocumentSync::SOURCE)
