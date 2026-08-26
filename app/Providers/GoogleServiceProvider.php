@@ -2,31 +2,18 @@
 
 namespace App\Providers;
 
-use Illuminate\Auth\Events\Login;
-use Illuminate\Support\Facades\Event;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
+use League\Flysystem\Filesystem;
+use Masbug\Flysystem\GoogleDriveAdapter;
 
-class AppServiceProvider extends ServiceProvider
+class GoogleDriveServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
-    {
-        //
-    }
-
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        Event::listen(Login::class, function (Login $event): void {
-            $event->user->forceFill(['last_login_at' => now()])->saveQuietly();
-        });
-        
         Storage::extend('google', function ($app, $config) {
+
             $options = [];
 
             if (!empty($config['teamDriveId'] ?? null)) {
@@ -42,18 +29,21 @@ class AppServiceProvider extends ServiceProvider
             $client->setClientId($config['clientId']);
             $client->setClientSecret($config['clientSecret']);
             $client->refreshToken($config['refreshToken']);
+            $client->setApplicationName(
+                config('app.name', 'Laravel')
+            );
 
             $service = new \Google\Service\Drive($client);
 
-            $adapter = new \Masbug\Flysystem\GoogleDriveAdapter(
+            $adapter = new GoogleDriveAdapter(
                 $service,
                 $config['folder'] ?? '/',
                 $options
             );
 
-            $driver = new \League\Flysystem\Filesystem($adapter);
+            $driver = new Filesystem($adapter);
 
-            return new \Illuminate\Filesystem\FilesystemAdapter(
+            return new FilesystemAdapter(
                 $driver,
                 $adapter
             );

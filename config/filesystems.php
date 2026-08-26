@@ -59,14 +59,10 @@ return [
 
         'google' => [
             'driver' => 'google',
-            'client_id' => $googleDrive['client_id'],
-            'client_secret' => $googleDrive['client_secret'],
-            'redirect_uri' => $googleDrive['redirect_uri'],
-            'access_token' => $googleDrive['access_token'],
-            'refresh_token' => $googleDrive['refresh_token'],
-            'folder_id' => $googleDrive['folder_id'],
-            'throw' => true,
-            'report' => true,
+            'clientId' => env('GOOGLE_DRIVE_CLIENT_ID'),
+            'clientSecret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
+            'refreshToken' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
+            'folder' => env('GOOGLE_DRIVE_FOLDER', '/'),
         ],
 
         's3' => [
