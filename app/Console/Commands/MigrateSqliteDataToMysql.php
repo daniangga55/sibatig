@@ -37,9 +37,13 @@ class MigrateSqliteDataToMysql extends Command
         'team_members',
         'pkpt_activities',
         'pkpt_activity_team_member',
+        'non_pkpt_activities',
+        'non_pkpt_activity_team_member',
         'monitoring_evaluations',
         'spt_records',
         'documents',
+        'work_papers',
+        'assignment_reports',
     ];
 
     public function handle(): int

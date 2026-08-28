@@ -15,17 +15,17 @@ use Illuminate\Validation\Rules\Unique;
 
 class PkptActivityForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Schema $schema, string $scopeLabel = 'PKPT'): Schema
     {
         return $schema
             ->components([
-                Section::make('Identitas kegiatan PKPT')
-                    ->description('Nomor mengacu pada sumber PKPT resmi tahun berjalan.')
+                Section::make("Identitas kegiatan {$scopeLabel}")
+                    ->description("Nomor mengacu pada sumber data {$scopeLabel} tahun berjalan.")
                     ->columns(3)
                     ->schema([
                         TextInput::make('year')->label('Tahun')->numeric()->minValue(2020)->maxValue(2100)->default(2026)->required(),
                         TextInput::make('source_number')
-                            ->label('Nomor PKPT')->numeric()->minValue(1)->required()
+                            ->label("Nomor {$scopeLabel}")->numeric()->minValue(1)->required()
                             ->unique(ignoreRecord: true, modifyRuleUsing: fn (Unique $rule, Get $get): Unique => $rule->where('year', $get('year'))),
                         Select::make('category')->label('Kategori')->options(PkptCategory::options())->required()->native(false),
                         TextInput::make('assignment_type')->label('Jenis penugasan')->required()->maxLength(255),

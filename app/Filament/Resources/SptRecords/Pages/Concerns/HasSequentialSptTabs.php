@@ -81,9 +81,21 @@ trait HasSequentialSptTabs
             default => [],
         };
 
-        return collect($requiredFields)
+        $missing = collect($requiredFields)
             ->filter(fn (string $label, string $field): bool => blank($state[$field] ?? null))
             ->values()
             ->all();
+
+        if ($tab === 2) {
+            $activityField = ($state['relation_type'] ?? 'PKPT') === 'NON PKPT'
+                ? 'non_pkpt_activity_id'
+                : 'pkpt_activity_id';
+
+            if (blank($state[$activityField] ?? null)) {
+                $missing[] = 'Kegiatan induk';
+            }
+        }
+
+        return $missing;
     }
 }

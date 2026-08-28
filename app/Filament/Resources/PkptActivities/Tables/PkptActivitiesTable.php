@@ -14,11 +14,15 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class PkptActivitiesTable
 {
-    public static function configure(Table $table): Table
-    {
+    public static function configure(
+        Table $table,
+        string $monitoringRelation = 'monitoringEvaluations',
+        string $scopeLabel = 'PKPT',
+    ): Table {
         return $table
             ->deferLoading()
             ->paginated([10, 25, 50])
@@ -34,7 +38,7 @@ class PkptActivitiesTable
                     ->color(fn (PkptStatus $state): string => $state->color()),
                 TextColumn::make('progress')->label('Progres')->suffix('%')->sortable()->alignEnd(),
                 TextColumn::make('executor')->label('Pelaksana')->badge()->color('info')->toggleable(),
-                TextColumn::make('monitoring_evaluations_count')->label('Monev')->counts('monitoringEvaluations')->badge()->color('primary'),
+                TextColumn::make(Str::snake($monitoringRelation).'_count')->label('Monev')->counts($monitoringRelation)->badge()->color('primary'),
                 TextColumn::make('year')->label('Tahun')->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([

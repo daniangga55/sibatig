@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\NonPkptActivity;
 use App\Models\PkptActivity;
 use App\Models\SptRecord;
 use Carbon\Carbon;
@@ -29,12 +30,34 @@ class SptRecordSeeder extends Seeder
             }
 
             $pkptActivityId = null;
+            $nonPkptActivityId = null;
+            $relationType = $record['relation'] ?? 'NON PKPT';
 
             if (isset($record['pkptNo'])) {
                 $pkptActivityId = PkptActivity::query()
                     ->where('year', 2026)
                     ->where('source_number', $record['pkptNo'])
                     ->value('id');
+            }
+
+            if ($relationType === 'NON PKPT') {
+                $nonPkptActivityId = NonPkptActivity::query()->updateOrCreate(
+                    ['year' => 2026, 'source_number' => $record['no']],
+                    [
+                        'category' => $this->categoryFrom((string) ($record['type'] ?? 'LAINNYA')),
+                        'assignment_type' => $record['type'] ?? 'LAINNYA',
+                        'assignment' => $record['subject'],
+                        'audit_object' => $record['obrik'] ?? null,
+                        'executor' => 'IRBAN III',
+                        'status' => ($record['status'] ?? 'SELESAI') === 'SELESAI' ? 'selesai' : 'sedang_berjalan',
+                        'progress' => ($record['status'] ?? 'SELESAI') === 'SELESAI' ? 100 : 50,
+                        'planned_start' => $this->parseDate($record['start']),
+                        'planned_end' => $this->parseDate($record['end'] ?? null),
+                        'actual_start' => $this->parseDate($record['start']),
+                        'actual_end' => ($record['status'] ?? 'SELESAI') === 'SELESAI' ? $this->parseDate($record['end'] ?? null) : null,
+                        'notes' => 'Dibentuk otomatis dari data SPT Non-PKPT.',
+                    ],
+                )->id;
             }
 
             SptRecord::query()->updateOrCreate(
@@ -51,9 +74,10 @@ class SptRecordSeeder extends Seeder
                     'report_number' => $record['lhp'] ?? null,
                     'report_date' => $this->parseDate($record['lhpDate'] ?? null),
                     'assignment_type' => $record['type'] ?? 'LAINNYA',
-                    'relation_type' => $record['relation'] ?? 'NON PKPT',
+                    'relation_type' => $relationType,
                     'status' => $record['status'] ?? 'SELESAI',
                     'pkpt_activity_id' => $pkptActivityId,
+                    'non_pkpt_activity_id' => $nonPkptActivityId,
                     'match_type' => $record['match'] ?? null,
                 ],
             );
@@ -90,5 +114,19 @@ class SptRecordSeeder extends Seeder
 
         return Carbon::createFromFormat('d m Y', str_replace(array_keys($months), array_values($months), $value))
             ->toDateString();
+    }
+
+    private function categoryFrom(string $assignmentType): string
+    {
+        $type = strtoupper($assignmentType);
+
+        return match (true) {
+            str_contains($type, 'AUDIT') => 'audit',
+            str_contains($type, 'REVIU') => 'reviu',
+            str_contains($type, 'MONITOR') => 'monitoring',
+            str_contains($type, 'EVALUASI') => 'evaluasi',
+            str_contains($type, 'PENDAMPING') => 'pendampingan',
+            default => 'mandatory',
+        };
     }
 }

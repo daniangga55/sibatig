@@ -24,6 +24,22 @@ Google Drive menyimpan **file dokumen**, sedangkan metadata, kategori, relasi SP
 
 4. Aplikasi akan membuat folder `SIBATIG` secara otomatis setelah otorisasi berhasil.
 
+Dokumen baru disimpan menggunakan struktur berikut (folder tahun dibuat otomatis):
+
+```text
+SIBATIG/
+|-- PKPT/
+|   |-- SPT/{tahun}/
+|   |-- KERTAS KERJA/{tahun}/
+|   `-- LAPORAN/{tahun}/
+`-- NON PKPT/
+    |-- SPT/{tahun}/
+    |-- KERTAS KERJA/{tahun}/
+    `-- LAPORAN/{tahun}/
+```
+
+`GOOGLE_DRIVE_FOLDER_ID` menunjuk ke folder root `SIBATIG`, sehingga path yang tersimpan di database dimulai dari `PKPT/...` atau `NON PKPT/...`. File lama tidak dipindahkan atau dihapus; struktur ini berlaku untuk upload baru dan file pengganti.
+
 Client Secret pernah ditempel di dokumen proyek. Rotasi Client Secret di Google Cloud, unduh JSON OAuth yang baru, lalu ganti file lokal `storage/app/credentials/google-drive-oauth.json` sebelum melakukan otorisasi.
 
 ## 2. Konfigurasi `.env`
@@ -99,3 +115,53 @@ Dokumen baru akan masuk ke Google Drive. Record lama tetap memakai `storage_disk
 - Tambahkan redirect URI HTTPS domain production ke OAuth Client Google Cloud.
 - Folder Drive harus dimiliki atau dibagikan kepada akun yang melakukan otorisasi.
 - Cadangkan MySQL dan `storage/app/private/documents` sebelum memigrasikan file lama.
+
+## Deployment aaPanel
+
+Folder `storage/app/credentials` sengaja tidak masuk Git. Upload JSON OAuth yang sudah dirotasi secara manual ke server:
+
+```text
+/www/wwwroot/hehe.serat-ulem.my.id/sibatig/storage/app/credentials/google-drive-oauth.json
+```
+
+Gunakan konfigurasi production berikut:
+
+```dotenv
+APP_URL=https://hehe.serat-ulem.my.id
+DOCUMENT_FILESYSTEM_DISK=local
+GOOGLE_DRIVE_CREDENTIALS_PATH=storage/app/credentials/google-drive-oauth.json
+GOOGLE_DRIVE_TOKEN_PATH=storage/app/credentials/google-drive-token.json
+GOOGLE_DRIVE_FOLDER_PATH=storage/app/credentials/google-drive-folder.json
+GOOGLE_DRIVE_REDIRECT_URI=https://hehe.serat-ulem.my.id/admin/google-drive/oauth/callback
+```
+
+Kemudian jalankan dari root project:
+
+```bash
+composer install --no-dev --optimize-autoloader
+composer show klytron/laravel-google-drive-filesystem
+php artisan package:discover --ansi
+php artisan optimize:clear
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan filament:optimize
+```
+
+Pastikan direktori kredensial dapat dibaca dan ditulis oleh user web server karena token dan Folder ID akan dibuat di sana:
+
+```bash
+chown -R www:www storage/app/credentials storage/framework bootstrap/cache
+chmod 700 storage/app/credentials
+chmod 600 storage/app/credentials/google-drive-oauth.json
+```
+
+Jika user web server aaPanel bukan `www`, sesuaikan nama user dan group. Setelah login sebagai Super Admin, buka:
+
+```text
+https://hehe.serat-ulem.my.id/admin/google-drive/oauth/authorize
+```
+
+Sesudah callback berhasil, jalankan ulang `php artisan optimize:clear` lalu `php artisan sibatig:gdrive-check --write`. Ubah `DOCUMENT_FILESYSTEM_DISK=google` hanya setelah pemeriksaan berhasil.
+
+Pesan `Module "fileinfo" is already loaded` berarti ekstensi diaktifkan dua kali pada konfigurasi PHP CLI. Jalankan `php --ini`, cari dua deklarasi `extension=fileinfo`, lalu sisakan satu deklarasi saja. Ekstensi `fileinfo` tetap harus aktif.

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['year', 'source_number', 'document_number', 'document_date', 'start_date', 'end_date', 'report_due_date', 'subject', 'audit_object', 'report_number', 'report_date', 'assignment_type', 'relation_type', 'status', 'pkpt_activity_id', 'match_type', 'notes'])]
+#[Fillable(['year', 'source_number', 'document_number', 'document_date', 'start_date', 'end_date', 'report_due_date', 'subject', 'audit_object', 'report_number', 'report_date', 'assignment_type', 'relation_type', 'status', 'pkpt_activity_id', 'non_pkpt_activity_id', 'match_type', 'notes'])]
 class SptRecord extends Model
 {
     use FlushesSibatigMetrics, HasFactory, SoftDeletes;
@@ -33,8 +33,23 @@ class SptRecord extends Model
         return $this->belongsTo(PkptActivity::class);
     }
 
+    public function nonPkptActivity(): BelongsTo
+    {
+        return $this->belongsTo(NonPkptActivity::class);
+    }
+
     public function documents(): HasMany
     {
         return $this->hasMany(Document::class);
+    }
+
+    public function workPapers(): HasMany
+    {
+        return $this->hasMany(WorkPaper::class);
+    }
+
+    public function assignmentReports(): HasMany
+    {
+        return $this->hasMany(AssignmentReport::class);
     }
 }

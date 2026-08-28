@@ -56,6 +56,11 @@ class PkptActivity extends Model
         return $this->hasMany(MonitoringEvaluation::class);
     }
 
+    public function sptRecords(): HasMany
+    {
+        return $this->hasMany(SptRecord::class);
+    }
+
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

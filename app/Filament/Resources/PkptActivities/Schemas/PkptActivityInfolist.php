@@ -10,14 +10,14 @@ use Filament\Schemas\Schema;
 
 class PkptActivityInfolist
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Schema $schema, string $scopeLabel = 'PKPT'): Schema
     {
         return $schema
             ->components([
-                Section::make('Kegiatan PKPT')
+                Section::make("Kegiatan {$scopeLabel}")
                     ->columns(3)
                     ->schema([
-                        TextEntry::make('source_number')->label('Nomor PKPT')->badge(),
+                        TextEntry::make('source_number')->label("Nomor {$scopeLabel}")->badge(),
                         TextEntry::make('year')->label('Tahun'),
                         TextEntry::make('category')->label('Kategori')->badge()->formatStateUsing(fn (PkptCategory $state): string => $state->label()),
                         TextEntry::make('assignment_type')->label('Jenis penugasan'),

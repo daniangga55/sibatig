@@ -8,8 +8,10 @@ use Filament\Schemas\Schema;
 
 class SptRecordInfolist
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Schema $schema, string $scope = 'PKPT'): Schema
     {
+        $relationship = $scope === 'PKPT' ? 'pkptActivity' : 'nonPkptActivity';
+
         return $schema->components([
             Section::make('Ringkasan SPT')->columns(3)->schema([
                 TextEntry::make('document_number')->label('Nomor SPT')->copyable(),
@@ -22,7 +24,7 @@ class SptRecordInfolist
                 TextEntry::make('start_date')->label('Mulai')->date('d M Y'),
                 TextEntry::make('end_date')->label('Selesai')->date('d M Y')->placeholder('—'),
                 TextEntry::make('assignment_type')->label('Jenis')->badge(),
-                TextEntry::make('pkptActivity.source_number')->label('No. PKPT')->badge()->placeholder('Non-PKPT'),
+                TextEntry::make($relationship.'.source_number')->label("No. {$scope}")->badge(),
                 TextEntry::make('report_number')->label('Nomor laporan')->placeholder('—')->copyable(),
                 TextEntry::make('report_date')->label('Tanggal laporan')->date('d M Y')->placeholder('—'),
             ]),

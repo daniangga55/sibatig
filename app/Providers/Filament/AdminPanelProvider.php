@@ -45,21 +45,24 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::hex(WebsiteSetting::themeColor('primary_color', '#1769d2')),
             ])
             ->assets([
-                Css::make('sibatig-admin', asset('css/sibatig-admin.css').'?v=13'),
+                Css::make('sibatig-admin', asset('css/sibatig-admin.css').'?v=17'),
             ])
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('filament.partials.theme-variables'))
             ->renderHook(PanelsRenderHook::SIMPLE_LAYOUT_START, fn () => view('filament.partials.auth-showcase'))
             ->renderHook(PanelsRenderHook::SIDEBAR_FOOTER, fn () => view('filament.partials.sidebar-footer'))
             ->renderHook(PanelsRenderHook::TOPBAR_LOGO_AFTER, fn () => view('filament.partials.topbar-greeting'))
+            ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_BEFORE, fn () => view('filament.partials.topbar-clock'))
             ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_AFTER, fn () => view('filament.partials.topbar-actions'))
             ->spa(hasPrefetching: true)
             ->databaseTransactions()
             ->resourceCreatePageRedirect('index')
             ->resourceEditPageRedirect('index')
             ->sidebarWidth('15.375rem')
-            ->collapsibleNavigationGroups(false)
+            ->collapsibleNavigationGroups()
             ->navigationGroups([
                 NavigationGroup::make('Menu Utama')->collapsible(false),
+                NavigationGroup::make('PKPT')->collapsed(),
+                NavigationGroup::make('Non-PKPT')->collapsed(),
                 NavigationGroup::make('Lainnya')->collapsible(false),
                 NavigationGroup::make('Administrasi')->collapsible(false),
             ])

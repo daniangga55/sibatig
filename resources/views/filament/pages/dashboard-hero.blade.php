@@ -1,4 +1,11 @@
 <div class="sibatig-dashboard">
+    <div class="sibatig-dashboard-intro">
+        <div class="sibatig-welcome">
+            <span>Ringkasan operasional</span>
+            <strong>Dashboard Irban 3 Tahun {{ $year }}</strong>
+        </div>
+    </div>
+
     <section class="sibatig-hero">
         <div class="sibatig-hero-content">
             <span class="sibatig-eyebrow"><i></i> Data terintegrasi PKPT&ndash;Monitoring</span>
