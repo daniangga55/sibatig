@@ -329,6 +329,62 @@ body {
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--sibatig-primary) 10%, transparent);
 }
 
+.sibatig-topbar-clock {
+    display: flex;
+    order: -20 !important;
+    flex: none;
+    align-items: center;
+    gap: .5rem;
+    min-width: 10.25rem;
+    height: 2.75rem;
+    padding-inline: .7rem;
+    background: #f7f9fc;
+    border: 1px solid #e8edf3;
+    border-radius: .7rem;
+}
+
+.sibatig-topbar-clock > svg {
+    width: 1rem;
+    flex: none;
+    color: var(--sibatig-primary);
+    fill: currentColor;
+}
+
+.sibatig-topbar-clock time {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    line-height: 1.15;
+}
+
+.sibatig-topbar-clock strong {
+    color: var(--sibatig-ink);
+    font-size: .78rem;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .035em;
+    white-space: nowrap;
+}
+
+.sibatig-topbar-clock small {
+    margin-top: .2rem;
+    overflow: hidden;
+    color: #7a8a9d;
+    font-size: .53rem;
+    text-overflow: ellipsis;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.sibatig-topbar-clock > i {
+    width: .38rem;
+    height: .38rem;
+    flex: none;
+    background: #18a67a;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(24, 166, 122, .1);
+}
+
 .sibatig-topbar-greeting {
     display: flex;
     flex-direction: column;
@@ -349,16 +405,17 @@ body {
 
 .fi-topbar-end {
     gap: .75rem;
+    flex-direction: row !important;
 }
 
 .fi-topbar-end .fi-global-search {
-    order: 1;
+    order: -10 !important;
 }
 
 .sibatig-topbar-notification {
     position: relative;
     display: grid;
-    order: 2;
+    order: 3;
     flex: none;
     width: 2.3rem;
     height: 2.3rem;
@@ -396,7 +453,7 @@ body {
 }
 
 .fi-topbar-end > .fi-user-menu {
-    order: 3;
+    order: 4;
     margin-left: .1rem;
     padding-left: .95rem;
     border-left: 1px solid var(--sibatig-line);
@@ -416,7 +473,7 @@ body {
 
 .sibatig-topbar-profile-copy {
     display: flex;
-    order: 4;
+    order: 5;
     align-items: center;
     gap: .55rem;
     min-width: 9.5rem;
@@ -507,6 +564,15 @@ body {
     .sibatig-topbar-profile-copy small {
         display: none;
     }
+
+    .sibatig-topbar-clock {
+        min-width: 5.75rem;
+    }
+
+    .sibatig-topbar-clock small,
+    .sibatig-topbar-clock > i {
+        display: none;
+    }
 }
 
 @media (max-width: 1023px) {
@@ -526,6 +592,17 @@ body {
     .fi-global-search-field {
         width: min(18rem, 42vw);
         min-width: min(18rem, 42vw);
+    }
+
+    .sibatig-topbar-clock {
+        min-width: 5.75rem;
+        height: 2.45rem;
+        padding-inline: .55rem;
+    }
+
+    .sibatig-topbar-clock small,
+    .sibatig-topbar-clock > i {
+        display: none;
     }
 }
 
@@ -654,15 +731,6 @@ body {
 .sibatig-welcome strong {
     color: var(--sibatig-ink);
     font-size: 1rem;
-}
-
-.sibatig-dashboard-intro time {
-    padding: .45rem .7rem;
-    color: #66778b;
-    font-size: .72rem;
-    background: #fff;
-    border: 1px solid var(--sibatig-line);
-    border-radius: .55rem;
 }
 
 .sibatig-hero {
@@ -943,17 +1011,6 @@ body {
 .sibatig-dashboard {
     display: grid;
     gap: 1rem;
-}
-
-.sibatig-dashboard-intro time {
-    display: inline-flex;
-    align-items: center;
-    gap: .45rem;
-}
-
-.sibatig-dashboard-intro time svg {
-    width: .9rem;
-    fill: currentColor;
 }
 
 .sibatig-mini-bars {
@@ -1419,7 +1476,6 @@ body {
 @media (max-width: 700px) {
     .sibatig-dashboard { gap: .8rem; }
     .sibatig-dashboard-intro { align-items: flex-start; }
-    .sibatig-dashboard-intro time { max-width: 10rem; line-height: 1.35; }
     .sibatig-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; }
     .sibatig-stat-card { min-height: 8.25rem; padding: .85rem; }
     .sibatig-stat-card > div:last-child { align-items: flex-start; flex-direction: column; gap: .2rem; }
@@ -2390,11 +2446,16 @@ body {
     border-color: #263449;
 }
 
-.dark .sibatig-dashboard-intro time,
+.dark .sibatig-topbar-clock strong,
 .dark .sibatig-section-heading h2,
 .dark .sibatig-welcome strong,
 .dark .fi-wi-stats-overview-stat-value {
     color: #e7edf6;
+}
+
+.dark .sibatig-topbar-clock {
+    background: #172235;
+    border-color: #2a394f;
 }
 
 @media (max-width: 1100px) {
@@ -2493,9 +2554,22 @@ body {
 }
 
 @media (max-width: 560px) {
-    .sibatig-dashboard-intro time {
-        max-width: 8.5rem;
-        text-align: center;
+    .sibatig-dashboard-intro {
+        gap: .7rem;
+    }
+
+    .fi-topbar-end {
+        gap: .35rem;
+    }
+
+    .sibatig-topbar-clock {
+        min-width: 3.4rem;
+        padding-inline: .4rem;
+    }
+
+    .sibatig-topbar-clock > svg,
+    .sibatig-clock-seconds {
+        display: none;
     }
 
     .sibatig-hero {

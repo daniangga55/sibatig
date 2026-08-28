@@ -16,15 +16,18 @@ use Filament\Tables\Table;
 
 class MonitoringEvaluationsTable
 {
-    public static function configure(Table $table): Table
+    public static function configure(Table $table, string $scope = 'PKPT'): Table
     {
+        $relationship = $scope === 'PKPT' ? 'pkptActivity' : 'nonPkptActivity';
+        $foreignKey = $scope === 'PKPT' ? 'pkpt_activity_id' : 'non_pkpt_activity_id';
+
         return $table
             ->deferLoading()
             ->paginated([10, 25, 50])
             ->defaultPaginationPageOption(10)
             ->columns([
-                TextColumn::make('pkptActivity.source_number')->label('No. PKPT')->badge()->color('gray')->sortable(),
-                TextColumn::make('pkptActivity.assignment')->label('Kegiatan')->searchable()->wrap()->limit(70)->weight('medium'),
+                TextColumn::make($relationship.'.source_number')->label("No. {$scope}")->badge()->color('gray')->sortable(),
+                TextColumn::make($relationship.'.assignment')->label('Kegiatan')->searchable()->wrap()->limit(70)->weight('medium'),
                 TextColumn::make('evaluation_date')->label('Tanggal evaluasi')->date('d M Y')->sortable(),
                 TextColumn::make('status')->label('Status')->badge()->formatStateUsing(fn (PkptStatus $state): string => $state->label())->color(fn (PkptStatus $state): string => $state->color()),
                 TextColumn::make('progress')->label('Progres')->suffix('%')->sortable()->alignEnd(),
@@ -33,18 +36,14 @@ class MonitoringEvaluationsTable
             ])
             ->filters([
                 TrashedFilter::make(),
-                SelectFilter::make('status')->label('Status')->options(PkptStatus::options()),
-                SelectFilter::make('pkpt_activity_id')
-                    ->label('Kegiatan PKPT')
-                    ->relationship('pkptActivity', 'assignment', modifyQueryUsing: fn ($query) => $query->where('year', 2026)->orderBy('source_number'))
+                SelectFilter::make($foreignKey)
+                    ->label("Kegiatan {$scope}")
+                    ->relationship($relationship, 'assignment', modifyQueryUsing: fn ($query) => $query->where('year', 2026)->orderBy('source_number'))
                     ->searchable()
                     ->preload(),
             ])
             ->defaultSort('evaluation_date', 'desc')
-            ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-            ])
+            ->recordActions([ViewAction::make(), EditAction::make()])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

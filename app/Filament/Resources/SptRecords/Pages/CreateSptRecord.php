@@ -31,6 +31,8 @@ class CreateSptRecord extends CreateRecord
     {
         $this->sptDocumentPath = SptDocumentSync::pathFromState($data['spt_file'] ?? null);
         $this->sptDocumentOriginalName = $data['spt_file_original_name'] ?? null;
+        $data['relation_type'] = 'PKPT';
+        $data['non_pkpt_activity_id'] = null;
 
         unset($data['spt_file'], $data['spt_file_original_name']);
 

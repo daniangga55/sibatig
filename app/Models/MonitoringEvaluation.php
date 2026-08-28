@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['pkpt_activity_id', 'evaluation_date', 'status', 'progress', 'stage', 'actual_start', 'actual_end', 'achievement', 'obstacles', 'follow_up', 'updated_by'])]
+#[Fillable(['pkpt_activity_id', 'non_pkpt_activity_id', 'evaluation_date', 'status', 'progress', 'stage', 'actual_start', 'actual_end', 'achievement', 'obstacles', 'follow_up', 'updated_by'])]
 class MonitoringEvaluation extends Model
 {
     use FlushesSibatigMetrics, HasFactory, SoftDeletes;
@@ -36,14 +36,19 @@ class MonitoringEvaluation extends Model
             $evaluation->updated_by = auth()->id() ?? $evaluation->updated_by;
         });
 
-        static::saved(fn (MonitoringEvaluation $evaluation) => $evaluation->syncPkptSummary());
-        static::deleted(fn (MonitoringEvaluation $evaluation) => $evaluation->syncPkptSummary());
-        static::restored(fn (MonitoringEvaluation $evaluation) => $evaluation->syncPkptSummary());
+        static::saved(fn (MonitoringEvaluation $evaluation) => $evaluation->syncActivitySummary());
+        static::deleted(fn (MonitoringEvaluation $evaluation) => $evaluation->syncActivitySummary());
+        static::restored(fn (MonitoringEvaluation $evaluation) => $evaluation->syncActivitySummary());
     }
 
     public function pkptActivity(): BelongsTo
     {
         return $this->belongsTo(PkptActivity::class);
+    }
+
+    public function nonPkptActivity(): BelongsTo
+    {
+        return $this->belongsTo(NonPkptActivity::class);
     }
 
     public function updater(): BelongsTo
@@ -53,7 +58,14 @@ class MonitoringEvaluation extends Model
 
     public function syncPkptSummary(): void
     {
-        $activity = $this->pkptActivity()->withTrashed()->first();
+        $this->syncActivitySummary();
+    }
+
+    public function syncActivitySummary(): void
+    {
+        $activity = $this->pkpt_activity_id
+            ? $this->pkptActivity()->withTrashed()->first()
+            : $this->nonPkptActivity()->withTrashed()->first();
 
         if (! $activity || $activity->trashed()) {
             return;

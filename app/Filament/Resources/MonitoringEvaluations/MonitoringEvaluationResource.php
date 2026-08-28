@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MonitoringEvaluations;
 
+use App\Enums\PkptStatus;
 use App\Filament\Resources\MonitoringEvaluations\Pages\CreateMonitoringEvaluation;
 use App\Filament\Resources\MonitoringEvaluations\Pages\EditMonitoringEvaluation;
 use App\Filament\Resources\MonitoringEvaluations\Pages\ListMonitoringEvaluations;
@@ -30,11 +31,11 @@ class MonitoringEvaluationResource extends Resource
 
     protected static ?string $modelLabel = 'monitoring dan evaluasi';
 
-    protected static ?string $pluralModelLabel = 'Monitoring & Evaluasi';
+    protected static ?string $pluralModelLabel = 'Monitoring & Evaluasi PKPT';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Menu Utama';
+    protected static string|UnitEnum|null $navigationGroup = 'PKPT';
 
-    protected static ?int $navigationSort = 30;
+    protected static ?int $navigationSort = 20;
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -81,8 +82,17 @@ class MonitoringEvaluationResource extends Resource
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
         return parent::getRecordRouteBindingEloquentQuery()
+            ->whereNotNull('pkpt_activity_id')
+            ->where('status', PkptStatus::Selesai->value)
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->whereNotNull('pkpt_activity_id')
+            ->where('status', PkptStatus::Selesai->value);
     }
 }

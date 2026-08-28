@@ -7,6 +7,8 @@ use App\Enums\PkptStatus;
 use App\Enums\UserRole;
 use App\Filament\Pages\KalenderKegiatan;
 use App\Filament\Pages\Pengumuman;
+use App\Filament\Resources\AssignmentReports\Pages\CreateAssignmentReport;
+use App\Filament\Resources\AssignmentReports\Pages\ListAssignmentReports;
 use App\Filament\Resources\Documents\Pages\CreateDocument;
 use App\Filament\Resources\Documents\Pages\EditDocument;
 use App\Filament\Resources\Documents\Pages\ListDocuments;
@@ -15,6 +17,17 @@ use App\Filament\Resources\MonitoringEvaluations\MonitoringEvaluationResource;
 use App\Filament\Resources\MonitoringEvaluations\Pages\CreateMonitoringEvaluation;
 use App\Filament\Resources\MonitoringEvaluations\Pages\EditMonitoringEvaluation;
 use App\Filament\Resources\MonitoringEvaluations\Pages\ViewMonitoringEvaluation;
+use App\Filament\Resources\NonPkptActivities\Pages\CreateNonPkptActivity;
+use App\Filament\Resources\NonPkptActivities\Pages\ListNonPkptActivities;
+use App\Filament\Resources\NonPkptAssignmentReports\Pages\CreateNonPkptAssignmentReport;
+use App\Filament\Resources\NonPkptAssignmentReports\Pages\ListNonPkptAssignmentReports;
+use App\Filament\Resources\NonPkptMonitoringEvaluations\Pages\CreateNonPkptMonitoringEvaluation;
+use App\Filament\Resources\NonPkptMonitoringEvaluations\Pages\ListNonPkptMonitoringEvaluations;
+use App\Filament\Resources\NonPkptSptRecords\Pages\CreateNonPkptSptRecord;
+use App\Filament\Resources\NonPkptSptRecords\Pages\EditNonPkptSptRecord;
+use App\Filament\Resources\NonPkptSptRecords\Pages\ListNonPkptSptRecords;
+use App\Filament\Resources\NonPkptWorkPapers\Pages\CreateNonPkptWorkPaper;
+use App\Filament\Resources\NonPkptWorkPapers\Pages\ListNonPkptWorkPapers;
 use App\Filament\Resources\PkptActivities\Pages\CreatePkptActivity;
 use App\Filament\Resources\PkptActivities\Pages\EditPkptActivity;
 use App\Filament\Resources\PkptActivities\Pages\ListPkptActivities;
@@ -34,16 +47,22 @@ use App\Filament\Resources\Users\Pages\ViewUser;
 use App\Filament\Resources\WebsiteSettings\Pages\EditWebsiteSetting;
 use App\Filament\Resources\WebsiteSettings\Pages\ListWebsiteSettings;
 use App\Filament\Resources\WebsiteSettings\Pages\ViewWebsiteSetting;
+use App\Filament\Resources\WorkPapers\Pages\CreateWorkPaper;
+use App\Filament\Resources\WorkPapers\Pages\ListWorkPapers;
 use App\Filament\Widgets\PkptStatsOverview;
 use App\Filament\Widgets\PkptStatusChart;
 use App\Filament\Widgets\RecentMonitoring;
+use App\Models\AssignmentReport;
 use App\Models\Document;
 use App\Models\MonitoringEvaluation;
+use App\Models\NonPkptActivity;
 use App\Models\PkptActivity;
 use App\Models\SptRecord;
 use App\Models\TeamMember;
 use App\Models\User;
 use App\Models\WebsiteSetting;
+use App\Models\WorkPaper;
+use App\Support\GoogleDriveStorage;
 use App\Support\SibatigMetrics;
 use App\Support\SptDocumentSync;
 use Database\Seeders\DatabaseSeeder;
@@ -84,7 +103,7 @@ class SibatigPanelTest extends TestCase
 
     public function test_spt_and_operational_navigation_pages_are_available(): void
     {
-        $record = SptRecord::query()->firstOrFail();
+        $record = SptRecord::query()->where('relation_type', 'PKPT')->firstOrFail();
 
         Livewire::test(ListSptRecords::class)->assertSuccessful();
         Livewire::test(CreateSptRecord::class)
@@ -133,7 +152,9 @@ class SibatigPanelTest extends TestCase
 
         $this->get('/admin')
             ->assertOk()
-            ->assertSee('Rekap SPT')
+            ->assertSee('Surat Perintah Tugas')
+            ->assertSee('Data PKPT')
+            ->assertSee('Data Non-PKPT')
             ->assertSee('Kalender Kegiatan')
             ->assertSee('Dokumen')
             ->assertSee('Pengumuman')
@@ -142,6 +163,8 @@ class SibatigPanelTest extends TestCase
 
     public function test_spt_form_tabs_must_be_completed_in_sequence(): void
     {
+        $activity = PkptActivity::query()->firstOrFail();
+
         Livewire::test(CreateSptRecord::class)
             ->call('advanceSptTab', 1)
             ->assertSet('activeSptTab', 1)
@@ -157,7 +180,8 @@ class SibatigPanelTest extends TestCase
             ->assertSet('highestAccessibleSptTab', 2)
             ->call('advanceSptTab', 2)
             ->assertSet('activeSptTab', 2)
-            ->set('data.relation_type', 'NON PKPT')
+            ->set('data.relation_type', 'PKPT')
+            ->set('data.pkpt_activity_id', $activity->id)
             ->set('data.assignment_type', 'REVIU')
             ->set('data.status', 'ON PROGRES')
             ->call('advanceSptTab', 2)
@@ -202,19 +226,33 @@ class SibatigPanelTest extends TestCase
             ->assertDontSee('M11 12.5h7v18', false);
         $this->get('/admin/password-reset/request')->assertOk();
 
-        $this->actingAs($this->admin)
+        $dashboardResponse = $this->actingAs($this->admin)
             ->get('/admin')
             ->assertOk()
             ->assertSee('Kinerja pengawasan')
             ->assertSee('Selamat datang kembali')
             ->assertSee('sibatig-topbar-profile-copy', false)
+            ->assertSee('sibatig-realtime-clock', false)
+            ->assertSee('Waktu Indonesia Barat', false)
             ->assertSee('images/logo-irban-3.jpg?v=20260819', false)
             ->assertSee('sibatig-stats-grid', false)
             ->assertSee('INTEGRASI PKPT&ndash;MONITORING', false)
             ->assertSee('--sibatig-primary: #1769d2', false);
+
+        $clockPosition = strpos($dashboardResponse->getContent(), 'class="sibatig-topbar-clock');
+        $searchPosition = strpos($dashboardResponse->getContent(), 'class="fi-global-search');
+        $this->assertIsInt($clockPosition);
+        $this->assertIsInt($searchPosition);
+        $this->assertLessThan($searchPosition, $clockPosition, 'Jam harus dirender di sebelah kiri pencarian.');
+
         Livewire::test(PkptStatsOverview::class)->assertSuccessful();
         Livewire::test(PkptStatusChart::class)->assertSuccessful();
         Livewire::test(RecentMonitoring::class)->assertSuccessful();
+
+        $this->get(MonitoringEvaluationResource::getUrl('index'))
+            ->assertOk()
+            ->assertSee('sibatig-topbar-clock', false)
+            ->assertSee('Waktu Indonesia Barat', false);
     }
 
     public function test_full_page_forms_render_with_reliable_cancel_action(): void
@@ -230,7 +268,7 @@ class SibatigPanelTest extends TestCase
     {
         $member = TeamMember::query()->firstOrFail();
         $activity = PkptActivity::query()->firstOrFail();
-        $evaluation = MonitoringEvaluation::query()->firstOrFail();
+        $evaluation = MonitoringEvaluation::query()->where('status', PkptStatus::Selesai->value)->firstOrFail();
         $setting = WebsiteSetting::query()->firstOrFail();
 
         Livewire::test(ViewUser::class, ['record' => $this->admin->getRouteKey()])->assertSuccessful();
@@ -428,6 +466,7 @@ class SibatigPanelTest extends TestCase
         $this->assertSame($spt->document_number, $document->document_number);
         $this->assertSame('SPT-Utama.pdf', $document->original_name);
         $this->assertSame($this->admin->id, $document->uploaded_by);
+        $this->assertSame('PKPT/SPT/2026/SPT-Utama.pdf', $document->file_path);
         Storage::disk('local')->assertExists($document->file_path);
 
         Livewire::test(ViewSptRecord::class, ['record' => $spt->getRouteKey()])
@@ -477,6 +516,220 @@ class SibatigPanelTest extends TestCase
         $this->get(route('documents.download', $document))
             ->assertOk()
             ->assertDownload('laporan-gdrive.pdf');
+    }
+
+    public function test_pkpt_and_non_pkpt_submenus_render_with_scoped_relations(): void
+    {
+        $nonPkptSptCount = SptRecord::query()->where('relation_type', 'NON PKPT')->count();
+
+        $this->assertGreaterThan(0, $nonPkptSptCount);
+        $this->assertSame(
+            0,
+            SptRecord::query()
+                ->where('relation_type', 'NON PKPT')
+                ->whereNull('non_pkpt_activity_id')
+                ->count(),
+        );
+        $this->assertSame(
+            0,
+            SptRecord::query()
+                ->where('relation_type', 'PKPT')
+                ->whereNull('pkpt_activity_id')
+                ->count(),
+        );
+        $this->assertSame($nonPkptSptCount, NonPkptActivity::query()->count());
+
+        Livewire::test(ListNonPkptActivities::class)->assertSuccessful();
+        Livewire::test(ListNonPkptMonitoringEvaluations::class)->assertSuccessful();
+        Livewire::test(ListNonPkptSptRecords::class)->assertSuccessful();
+        Livewire::test(CreateNonPkptSptRecord::class)
+            ->assertSuccessful()
+            ->assertSee('Integrasi NON PKPT');
+        Livewire::test(ListWorkPapers::class)->assertSuccessful();
+        Livewire::test(ListNonPkptWorkPapers::class)->assertSuccessful();
+        Livewire::test(ListAssignmentReports::class)->assertSuccessful();
+        Livewire::test(ListNonPkptAssignmentReports::class)->assertSuccessful();
+
+        Livewire::test(CreateNonPkptActivity::class)
+            ->fillForm([
+                'year' => 2026,
+                'source_number' => 99,
+                'category' => 'reviu',
+                'assignment_type' => 'Reviu Non-PKPT',
+                'assignment' => 'Pengujian kegiatan Non-PKPT',
+                'executor' => 'IRBAN III',
+                'apip_count' => 3,
+                'status' => PkptStatus::BelumDilaksanakan->value,
+                'progress' => 0,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('non_pkpt_activities', [
+            'source_number' => 99,
+            'assignment' => 'Pengujian kegiatan Non-PKPT',
+        ]);
+    }
+
+    public function test_completed_non_pkpt_monitoring_updates_its_parent_activity(): void
+    {
+        $activity = NonPkptActivity::query()->firstOrFail();
+
+        Livewire::test(CreateNonPkptMonitoringEvaluation::class)
+            ->fillForm([
+                'non_pkpt_activity_id' => $activity->id,
+                'evaluation_date' => '2026-08-20',
+                'status' => PkptStatus::Selesai->value,
+                'progress' => 100,
+                'stage' => 'Laporan selesai',
+                'actual_start' => '2026-08-18',
+                'actual_end' => '2026-08-20',
+                'achievement' => 'Penugasan Non-PKPT selesai.',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $activity->refresh();
+        $this->assertSame(PkptStatus::Selesai, $activity->status);
+        $this->assertSame(100, $activity->progress);
+        $this->assertDatabaseHas('monitoring_evaluations', [
+            'non_pkpt_activity_id' => $activity->id,
+            'pkpt_activity_id' => null,
+            'status' => PkptStatus::Selesai->value,
+        ]);
+    }
+
+    public function test_work_paper_and_assignment_report_use_private_scoped_files(): void
+    {
+        config(['filesystems.documents' => 'local']);
+        Storage::fake('local');
+
+        $spt = SptRecord::query()
+            ->where('relation_type', 'PKPT')
+            ->whereNotNull('pkpt_activity_id')
+            ->firstOrFail();
+
+        Livewire::test(CreateWorkPaper::class)
+            ->fillForm([
+                'year' => 2026,
+                'spt_record_id' => $spt->id,
+                'title' => 'Kertas Kerja Pengujian',
+                'document_date' => '2026-08-21',
+                'file_path' => UploadedFile::fake()->create(
+                    'kertas-kerja.xlsx',
+                    120,
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                ),
+            ])
+            ->assertSet('data.spt_record_id', $spt->id)
+            ->assertSet('data.title', 'Kertas Kerja Pengujian')
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $workPaper = WorkPaper::query()->firstOrFail();
+        $this->assertSame($spt->assignment_type, $workPaper->sptRecord->assignment_type);
+        $this->assertSame('PKPT/KERTAS KERJA/2026/kertas-kerja.xlsx', $workPaper->file_path);
+        Storage::disk('local')->assertExists($workPaper->file_path);
+        $this->get(route('work-papers.download', $workPaper))
+            ->assertOk()
+            ->assertDownload('kertas-kerja.xlsx');
+
+        Livewire::test(CreateAssignmentReport::class)
+            ->fillForm([
+                'year' => 2026,
+                'spt_record_id' => $spt->id,
+                'title' => 'Laporan Hasil Penugasan Pengujian',
+                'report_number' => 'LHP/TEST/2026',
+                'report_date' => '2026-08-22',
+                'file_path' => UploadedFile::fake()->create('laporan-hasil.pdf', 150, 'application/pdf'),
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $report = AssignmentReport::query()->firstOrFail();
+        $this->assertSame($spt->assignment_type, $report->sptRecord->assignment_type);
+        $this->assertSame('PKPT/LAPORAN/2026/laporan-hasil.pdf', $report->file_path);
+        Storage::disk('local')->assertExists($report->file_path);
+        $this->get(route('assignment-reports.download', $report))
+            ->assertOk()
+            ->assertDownload('laporan-hasil.pdf');
+
+        Livewire::test(CreateAssignmentReport::class)
+            ->fillForm([
+                'year' => 2026,
+                'spt_record_id' => $spt->id,
+                'title' => 'Laporan dengan format tidak valid',
+                'file_path' => UploadedFile::fake()->create(
+                    'laporan-tidak-valid.docx',
+                    50,
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                ),
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['file_path']);
+    }
+
+    public function test_document_folder_paths_are_scoped_for_pkpt_and_non_pkpt(): void
+    {
+        $this->assertSame('PKPT/SPT/2026', GoogleDriveStorage::path('PKPT', 'SPT', 2026));
+        $this->assertSame('PKPT/KERTAS KERJA/2026', GoogleDriveStorage::path('PKPT', 'work-paper', 2026));
+        $this->assertSame('PKPT/LAPORAN/2026', GoogleDriveStorage::path('PKPT', 'assignment-report', 2026));
+        $this->assertSame('NON PKPT/SPT/2026', GoogleDriveStorage::path('NON PKPT', 'SPT', 2026));
+        $this->assertSame('NON PKPT/KERTAS KERJA/2026', GoogleDriveStorage::path('non-pkpt', 'KERTAS KERJA', 2026));
+        $this->assertSame('NON PKPT/LAPORAN/2026', GoogleDriveStorage::path('NON_PKPT', 'LAPORAN', 2026));
+    }
+
+    public function test_non_pkpt_upload_forms_use_the_non_pkpt_drive_folders(): void
+    {
+        config(['filesystems.documents' => 'local']);
+        Storage::fake('local');
+
+        $spt = SptRecord::query()
+            ->where('relation_type', 'NON PKPT')
+            ->whereNotNull('non_pkpt_activity_id')
+            ->firstOrFail();
+
+        Livewire::test(EditNonPkptSptRecord::class, ['record' => $spt->getRouteKey()])
+            ->fillForm([
+                'spt_file' => UploadedFile::fake()->create('SPT-Non-PKPT.pdf', 100, 'application/pdf'),
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $sptDocument = SptDocumentSync::documentFor($spt->refresh());
+        $this->assertNotNull($sptDocument);
+        $this->assertSame('NON PKPT/SPT/2026/SPT-Non-PKPT.pdf', $sptDocument->file_path);
+        Storage::disk('local')->assertExists($sptDocument->file_path);
+
+        Livewire::test(CreateNonPkptWorkPaper::class)
+            ->fillForm([
+                'year' => 2026,
+                'spt_record_id' => $spt->id,
+                'title' => 'Kertas Kerja Non-PKPT',
+                'file_path' => UploadedFile::fake()->create(
+                    'kertas-kerja-non-pkpt.docx',
+                    80,
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                ),
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $workPaper = WorkPaper::query()->where('spt_record_id', $spt->id)->firstOrFail();
+        $this->assertSame('NON PKPT/KERTAS KERJA/2026/kertas-kerja-non-pkpt.docx', $workPaper->file_path);
+
+        Livewire::test(CreateNonPkptAssignmentReport::class)
+            ->fillForm([
+                'year' => 2026,
+                'spt_record_id' => $spt->id,
+                'title' => 'Laporan Non-PKPT',
+                'file_path' => UploadedFile::fake()->create('laporan-non-pkpt.pdf', 90, 'application/pdf'),
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $report = AssignmentReport::query()->where('spt_record_id', $spt->id)->firstOrFail();
+        $this->assertSame('NON PKPT/LAPORAN/2026/laporan-non-pkpt.pdf', $report->file_path);
     }
 
     public function test_inactive_user_cannot_access_panel(): void

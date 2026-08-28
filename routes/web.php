@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Controllers\AssignmentFileDownloadController;
 use App\Http\Controllers\DocumentDownloadController;
 use App\Http\Controllers\GoogleDriveOAuthController;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Request;
 use Google\Client;
 use Google\Service\Drive;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 Route::view('/', 'public.home')->name('home');
 Route::view('/privacy-policy', 'public.privacy-policy')->name('privacy-policy');
@@ -15,6 +16,14 @@ Route::view('/terms-of-service', 'public.terms-of-service')->name('terms-of-serv
 Route::get('/admin/documents/{document}/download', DocumentDownloadController::class)
     ->middleware('auth')
     ->name('documents.download');
+
+Route::get('/admin/work-papers/{workPaper}/download', [AssignmentFileDownloadController::class, 'workPaper'])
+    ->middleware('auth')
+    ->name('work-papers.download');
+
+Route::get('/admin/assignment-reports/{assignmentReport}/download', [AssignmentFileDownloadController::class, 'assignmentReport'])
+    ->middleware('auth')
+    ->name('assignment-reports.download');
 
 Route::middleware(['auth', 'throttle:6,1'])->group(function (): void {
     Route::get('/admin/google-drive/oauth/authorize', [GoogleDriveOAuthController::class, 'authorizeDrive'])
@@ -27,16 +36,16 @@ Route::get('/test-google-upload', function () {
     try {
         $disk = Storage::disk('google');
 
-        $path = 'test-' . now()->format('YmdHis') . '.txt';
+        $path = 'test-'.now()->format('YmdHis').'.txt';
 
-        $disk->put($path, 'Test Google Drive - ' . now());
+        $disk->put($path, 'Test Google Drive - '.now());
 
         return response()->json([
             'success' => true,
             'path' => $path,
             'message' => 'File berhasil dikirim ke Google Drive.',
         ]);
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         return response()->json([
             'success' => false,
             'error' => get_class($e),
@@ -48,7 +57,7 @@ Route::get('/test-google-upload', function () {
 });
 
 Route::get('/google-drive/auth', function () {
-    $client = new Client();
+    $client = new Client;
 
     $client->setClientId(env('GOOGLE_DRIVE_CLIENT_ID'));
     $client->setClientSecret(env('GOOGLE_DRIVE_CLIENT_SECRET'));
@@ -62,7 +71,7 @@ Route::get('/google-drive/auth', function () {
 });
 
 Route::get('/google-drive/callback', function () {
-    $client = new Client();
+    $client = new Client;
 
     $client->setClientId(env('GOOGLE_DRIVE_CLIENT_ID'));
     $client->setClientSecret(env('GOOGLE_DRIVE_CLIENT_SECRET'));

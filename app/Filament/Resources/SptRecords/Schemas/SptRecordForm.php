@@ -2,15 +2,18 @@
 
 namespace App\Filament\Resources\SptRecords\Schemas;
 
+use App\Models\NonPkptActivity;
 use App\Models\PkptActivity;
 use App\Models\SptRecord;
 use App\Rules\WorkingDay;
 use App\Support\DocumentStorage;
+use App\Support\GoogleDriveStorage;
 use App\Support\IndonesiaHolidayCalendar;
 use App\Support\SptDocumentSync;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -22,10 +25,14 @@ use Filament\Support\Icons\Heroicon;
 
 class SptRecordForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Schema $schema, string $scope = 'PKPT'): Schema
     {
+        $isPkpt = $scope === 'PKPT';
+        $relationship = $isPkpt ? 'pkptActivity' : 'nonPkptActivity';
+        $foreignKey = $isPkpt ? 'pkpt_activity_id' : 'non_pkpt_activity_id';
+
         return $schema->components([
-            Tabs::make('Form Rekap SPT')
+            Tabs::make('Form Surat Perintah Tugas')
                 ->livewireProperty('activeSptTab')
                 ->contained()
                 ->extraAttributes(['class' => 'sibatig-spt-tabs'])
@@ -63,26 +70,27 @@ class SptRecordForm
                             Textarea::make('subject')->label('Uraian penugasan')->rows(4)->required()->columnSpanFull(),
                             Textarea::make('audit_object')->label('Objek pemeriksaan')->rows(3)->columnSpanFull(),
                             Actions::make([
-                                Action::make('nextToPkptIntegration')
-                                    ->label('Selanjutnya: Integrasi PKPT')
+                                Action::make('nextToAssignmentIntegration')
+                                    ->label("Selanjutnya: Integrasi {$scope}")
                                     ->icon(Heroicon::OutlinedArrowRight)
                                     ->iconPosition('after')
                                     ->action(fn ($livewire) => $livewire->advanceSptTab(1)),
                             ])->alignEnd()->columnSpanFull(),
                         ]),
-                    2 => Tab::make('Integrasi PKPT & Laporan')
+                    2 => Tab::make("Integrasi {$scope} & Laporan")
                         ->icon(Heroicon::OutlinedLink)
                         ->badge('2')
                         ->extraAttributes(fn ($livewire): array => self::tabAccessAttributes($livewire, 2))
                         ->columns(3)
                         ->schema([
-                            Select::make('pkpt_activity_id')
-                                ->label('Kegiatan PKPT')
-                                ->relationship('pkptActivity', 'assignment', modifyQueryUsing: fn ($query) => $query->where('year', 2026)->orderBy('source_number'))
-                                ->getOptionLabelFromRecordUsing(fn (PkptActivity $record): string => "#{$record->source_number} · {$record->assignment}")
+                            Select::make($foreignKey)
+                                ->label("Kegiatan {$scope}")
+                                ->relationship($relationship, 'assignment', modifyQueryUsing: fn ($query) => $query->where('year', 2026)->orderBy('source_number'))
+                                ->getOptionLabelFromRecordUsing(fn (PkptActivity|NonPkptActivity $record): string => "#{$record->source_number} · {$record->assignment}")
                                 ->searchable(['assignment', 'source_number'])
-                                ->preload(),
-                            Select::make('relation_type')->label('Relasi')->options(['PKPT' => 'PKPT', 'NON PKPT' => 'Non-PKPT'])->required()->native(false),
+                                ->preload()
+                                ->required(),
+                            Hidden::make('relation_type')->default($scope)->required(),
                             Select::make('match_type')->label('Jenis kecocokan')->options(['exact' => 'Tepat', 'thematic' => 'Tematik', 'contextual' => 'Kontekstual'])->native(false),
                             Select::make('assignment_type')->label('Jenis penugasan')->options(['AUDIT' => 'Audit', 'REVIU' => 'Reviu', 'MONITORING' => 'Monitoring', 'EVALUASI' => 'Evaluasi', 'PENDAMPINGAN' => 'Pendampingan', 'MANDATORY' => 'Mandatory'])->required()->native(false),
                             Select::make('status')->label('Status')->options(['SELESAI' => 'Selesai', 'ON PROGRES' => 'On progress'])->required()->native(false),
@@ -91,16 +99,8 @@ class SptRecordForm
                             DatePicker::make('report_date')->label('Tanggal laporan')->native(false)->displayFormat('d/m/Y'),
                             Textarea::make('notes')->label('Catatan')->rows(3)->columnSpanFull(),
                             Actions::make([
-                                Action::make('backToIdentity')
-                                    ->label('Kembali')
-                                    ->color('gray')
-                                    ->icon(Heroicon::OutlinedArrowLeft)
-                                    ->action(fn ($livewire) => $livewire->returnToSptTab(1)),
-                                Action::make('nextToSptFile')
-                                    ->label('Selanjutnya: File SPT')
-                                    ->icon(Heroicon::OutlinedArrowRight)
-                                    ->iconPosition('after')
-                                    ->action(fn ($livewire) => $livewire->advanceSptTab(2)),
+                                Action::make('backToIdentity')->label('Kembali')->color('gray')->icon(Heroicon::OutlinedArrowLeft)->action(fn ($livewire) => $livewire->returnToSptTab(1)),
+                                Action::make('nextToSptFile')->label('Selanjutnya: File SPT')->icon(Heroicon::OutlinedArrowRight)->iconPosition('after')->action(fn ($livewire) => $livewire->advanceSptTab(2)),
                             ])->alignBetween()->columnSpanFull(),
                         ]),
                     3 => Tab::make('File SPT')
@@ -111,7 +111,14 @@ class SptRecordForm
                             FileUpload::make('spt_file')
                                 ->label('Upload file SPT')
                                 ->disk(fn (?SptRecord $record): string => SptDocumentSync::diskNameFor($record))
-                                ->directory('documents/2026/spt')
+                                ->directory(fn ($get, ?SptRecord $record): string => GoogleDriveStorage::path(
+                                    $scope,
+                                    GoogleDriveStorage::SPT,
+                                    self::uploadYear($get, $record),
+                                ))
+                                ->getUploadedFileNameForStorageUsing(
+                                    fn ($file): string => $file->getClientOriginalName(),
+                                )
                                 ->visibility('private')
                                 ->acceptedFileTypes([
                                     'application/pdf',
@@ -124,13 +131,11 @@ class SptRecordForm
                                 ->storeFileNamesIn('spt_file_original_name')
                                 ->previewable(false)
                                 ->downloadable()
-                                ->getUploadedFileUsing(function (string $file, string|array|null $storedFileNames, ?SptRecord $record): ?array {
-                                    return DocumentStorage::uploadedFileData(
-                                        $record ? SptDocumentSync::documentFor($record) : null,
-                                        $file,
-                                        $storedFileNames,
-                                    );
-                                })
+                                ->getUploadedFileUsing(fn (string $file, string|array|null $storedFileNames, ?SptRecord $record): ?array => DocumentStorage::uploadedFileData(
+                                    $record ? SptDocumentSync::documentFor($record) : null,
+                                    $file,
+                                    $storedFileNames,
+                                ))
                                 ->getDownloadableFileUrlUsing(function (?SptRecord $record): ?string {
                                     $document = $record ? SptDocumentSync::documentFor($record) : null;
 
@@ -142,18 +147,29 @@ class SptRecordForm
                                         ->where('file_path', $file)
                                         ->exists() ?? false,
                                 )
-                                ->helperText('File otomatis masuk ke menu Dokumen. Format PDF, Word, JPG, atau PNG; maksimal 20 MB. Upload baru mengganti file SPT utama sebelumnya.'),
+                                ->helperText("File otomatis masuk ke Google Drive: SIBATIG/{$scope}/SPT/{tahun}. Nama file asli dipertahankan; maksimal 20 MB."),
                             Actions::make([
-                                Action::make('backToPkptIntegration')
-                                    ->label('Kembali ke Integrasi PKPT')
-                                    ->color('gray')
-                                    ->icon(Heroicon::OutlinedArrowLeft)
-                                    ->action(fn ($livewire) => $livewire->returnToSptTab(2)),
+                                Action::make('backToAssignmentIntegration')->label("Kembali ke Integrasi {$scope}")->color('gray')->icon(Heroicon::OutlinedArrowLeft)->action(fn ($livewire) => $livewire->returnToSptTab(2)),
                             ])->alignStart()->columnSpanFull(),
                         ]),
                 ])
                 ->columnSpanFull(),
         ]);
+    }
+
+    private static function uploadYear(mixed $get, ?SptRecord $record): int|string
+    {
+        $year = null;
+
+        if (is_callable($get)) {
+            try {
+                $year = $get('year');
+            } catch (\Throwable) {
+                $year = null;
+            }
+        }
+
+        return $year ?: ($record?->year ?: date('Y'));
     }
 
     private static function tabAccessAttributes(object $livewire, int $tab): array

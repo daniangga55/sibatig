@@ -10,7 +10,6 @@ use App\Filament\Resources\SptRecords\Schemas\SptRecordForm;
 use App\Filament\Resources\SptRecords\Schemas\SptRecordInfolist;
 use App\Filament\Resources\SptRecords\Tables\SptRecordsTable;
 use App\Models\SptRecord;
-use App\Support\SibatigMetrics;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -26,17 +25,17 @@ class SptRecordResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
-    protected static ?string $navigationLabel = 'Rekap SPT';
+    protected static ?string $navigationLabel = 'Surat Perintah Tugas';
 
     protected static ?string $modelLabel = 'SPT';
 
-    protected static ?string $pluralModelLabel = 'Rekap SPT';
+    protected static ?string $pluralModelLabel = 'Surat Perintah Tugas PKPT';
 
     protected static ?string $recordTitleAttribute = 'document_number';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Menu Utama';
+    protected static string|UnitEnum|null $navigationGroup = 'PKPT';
 
-    protected static ?int $navigationSort = 40;
+    protected static ?int $navigationSort = 30;
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -45,22 +44,22 @@ class SptRecordResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) SibatigMetrics::get('spt_total');
+        return (string) static::getEloquentQuery()->count();
     }
 
     public static function form(Schema $schema): Schema
     {
-        return SptRecordForm::configure($schema);
+        return SptRecordForm::configure($schema, 'PKPT');
     }
 
     public static function infolist(Schema $schema): Schema
     {
-        return SptRecordInfolist::configure($schema);
+        return SptRecordInfolist::configure($schema, 'PKPT');
     }
 
     public static function table(Table $table): Table
     {
-        return SptRecordsTable::configure($table);
+        return SptRecordsTable::configure($table, 'PKPT');
     }
 
     public static function getPages(): array
@@ -75,6 +74,13 @@ class SptRecordResource extends Resource
 
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
-        return parent::getRecordRouteBindingEloquentQuery()->withoutGlobalScopes([SoftDeletingScope::class]);
+        return parent::getRecordRouteBindingEloquentQuery()
+            ->where('relation_type', 'PKPT')
+            ->withoutGlobalScopes([SoftDeletingScope::class]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->where('relation_type', 'PKPT');
     }
 }

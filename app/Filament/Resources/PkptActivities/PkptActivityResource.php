@@ -26,17 +26,17 @@ class PkptActivityResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
 
-    protected static ?string $navigationLabel = 'PKPT 2026';
+    protected static ?string $navigationLabel = 'Data PKPT';
 
     protected static ?string $modelLabel = 'kegiatan PKPT';
 
-    protected static ?string $pluralModelLabel = 'PKPT 2026';
+    protected static ?string $pluralModelLabel = 'Data PKPT';
 
     protected static ?string $recordTitleAttribute = 'assignment';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Menu Utama';
+    protected static string|UnitEnum|null $navigationGroup = 'PKPT';
 
-    protected static ?int $navigationSort = 20;
+    protected static ?int $navigationSort = 10;
 
     public static function getGloballySearchableAttributes(): array
     {

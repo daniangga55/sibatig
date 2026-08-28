@@ -34,4 +34,11 @@ class TeamMember extends Model
             ->withPivot('role')
             ->withTimestamps();
     }
+
+    public function nonPkptActivities(): BelongsToMany
+    {
+        return $this->belongsToMany(NonPkptActivity::class, 'non_pkpt_activity_team_member')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
 }
