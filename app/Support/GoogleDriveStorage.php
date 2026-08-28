@@ -5,6 +5,7 @@ namespace App\Support;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use RuntimeException;
 
 final class GoogleDriveStorage
 {
@@ -52,8 +53,21 @@ final class GoogleDriveStorage
         $storage->makeDirectory($directory);
 
         $originalName = basename(str_replace('\\', '/', $file->getClientOriginalName()));
+        $path = trim($directory.'/'.$originalName, '/');
 
-        return $file->storeAs($directory, $originalName, $disk);
+        // TemporaryUploadedFile::storeAs() selalu mengirim resource sehingga
+        // Flysystem memilih writeStream(). Pada beberapa server Masbug, write()
+        // berhasil tetapi writeStream() gagal. Ukuran form dibatasi 20 MB, jadi
+        // aman membaca temporary upload lalu memakai jalur put()/write().
+        if (! $storage->put($path, $file->get())) {
+            throw new RuntimeException("File tidak dapat disimpan ke [{$disk}:{$path}].");
+        }
+
+        if (! $storage->exists($path)) {
+            throw new RuntimeException("File [{$disk}:{$path}] tidak ditemukan setelah proses upload.");
+        }
+
+        return $path;
     }
 
     private static function normalizeScope(string $scope): string

@@ -41,6 +41,13 @@ class CheckGoogleDriveStorage extends Command
             return self::FAILURE;
         }
 
+        $documentDisk = (string) config('filesystems.documents', 'local');
+        $this->line("Disk aktif form dokumen: {$documentDisk}");
+
+        if ($documentDisk !== 'google') {
+            $this->warn('Google Drive dapat diuji, tetapi form masih memakai disk non-Google. Atur DOCUMENT_FILESYSTEM_DISK=google lalu bersihkan cache konfigurasi.');
+        }
+
         try {
             $disk = Storage::disk('google');
 
