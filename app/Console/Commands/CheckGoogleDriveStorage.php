@@ -2,15 +2,18 @@
 
 namespace App\Console\Commands;
 
+use App\Support\GoogleDriveStorage;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use RuntimeException;
 use Throwable;
 
 class CheckGoogleDriveStorage extends Command
 {
     protected $signature = 'sibatig:gdrive-check
-        {--write : Uji unggah, baca, dan hapus satu file sementara}';
+        {--write : Siapkan folder lalu uji unggah, baca, dan hapus file sementara}
+        {--year=2026 : Tahun folder dokumen yang akan disiapkan}';
 
     protected $description = 'Memeriksa konfigurasi dan akses penyimpanan Google Drive SIBATIG';
 
@@ -55,24 +58,51 @@ class CheckGoogleDriveStorage extends Command
                 return self::SUCCESS;
             }
 
-            $path = '.sibatig-health-check-'.Str::uuid().'.txt';
+            $year = (string) $this->option('year');
+            $directories = [
+                GoogleDriveStorage::path(GoogleDriveStorage::PKPT, GoogleDriveStorage::SPT, $year),
+                GoogleDriveStorage::path(GoogleDriveStorage::PKPT, GoogleDriveStorage::WORK_PAPER, $year),
+                GoogleDriveStorage::path(GoogleDriveStorage::PKPT, GoogleDriveStorage::REPORT, $year),
+                GoogleDriveStorage::path(GoogleDriveStorage::NON_PKPT, GoogleDriveStorage::SPT, $year),
+                GoogleDriveStorage::path(GoogleDriveStorage::NON_PKPT, GoogleDriveStorage::WORK_PAPER, $year),
+                GoogleDriveStorage::path(GoogleDriveStorage::NON_PKPT, GoogleDriveStorage::REPORT, $year),
+            ];
+            $testPaths = [];
 
             try {
                 $contents = 'SIBATIG Google Drive check '.now()->toIso8601String();
-                $disk->put($path, $contents);
 
-                if (! $disk->exists($path) || $disk->get($path) !== $contents) {
-                    $this->error('File uji tidak dapat diverifikasi setelah diunggah.');
+                foreach ($directories as $directory) {
+                    $this->line("Menyiapkan folder: SIBATIG/{$directory}");
+                    $disk->makeDirectory($directory);
+
+                    if (! $disk->directoryExists($directory)) {
+                        throw new RuntimeException("Folder [SIBATIG/{$directory}] tidak dapat diverifikasi.");
+                    }
+
+                    $path = $directory.'/.sibatig-health-check-'.Str::uuid().'.txt';
+                    $testPaths[] = $path;
+                    $disk->put($path, $contents);
+
+                    if (! $disk->exists($path) || $disk->get($path) !== $contents) {
+                        throw new RuntimeException("File uji [SIBATIG/{$path}] tidak dapat diverifikasi.");
+                    }
+                }
+
+                if ($testPaths === []) {
+                    $this->error('Tidak ada folder yang diuji.');
 
                     return self::FAILURE;
                 }
             } finally {
-                if (isset($path) && $disk->exists($path)) {
-                    $disk->delete($path);
+                foreach ($testPaths as $path) {
+                    if ($disk->exists($path)) {
+                        $disk->delete($path);
+                    }
                 }
             }
 
-            $this->info('Uji unggah, baca, dan hapus berhasil. Google Drive siap digunakan.');
+            $this->info('Seluruh folder dokumen berhasil disiapkan. Uji unggah, baca, dan hapus berhasil.');
 
             return self::SUCCESS;
         } catch (Throwable $exception) {

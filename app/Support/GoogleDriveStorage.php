@@ -46,10 +46,10 @@ final class GoogleDriveStorage
         }
 
         $storage = Storage::disk($disk);
-
-        if (! $storage->directoryExists($directory)) {
-            $storage->makeDirectory($directory);
-        }
+        // Masbug membuat parent secara rekursif dan mengembalikan sukses bila
+        // direktori sudah ada. Hindari directoryExists() sebelum pembuatan,
+        // karena lookup display path yang belum ada dapat gagal lebih awal.
+        $storage->makeDirectory($directory);
 
         $originalName = basename(str_replace('\\', '/', $file->getClientOriginalName()));
 
