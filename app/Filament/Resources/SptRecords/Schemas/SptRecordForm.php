@@ -19,6 +19,7 @@ use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use App\Support\GoogleDriveStorage;
 
 class SptRecordForm
 {
@@ -110,8 +111,25 @@ class SptRecordForm
                         ->schema([
                             FileUpload::make('spt_file')
                                 ->label('Upload file SPT')
-                                ->disk(fn (?SptRecord $record): string => SptDocumentSync::diskNameFor($record))
-                                ->directory('documents/2026/spt')
+                                ->disk('google')
+                                ->directory(function ($get, ?SptRecord $record): string {
+                                    $year = null;
+                            
+                                    if (is_callable($get)) {
+                                        try {
+                                            $year = $get('year');
+                                        } catch (\Throwable) {
+                                            $year = null;
+                                        }
+                                    }
+                            
+                                    $year = $year ?: ($record?->year ?: date('Y'));
+                            
+                                    return GoogleDriveStorage::path('SPT', (string) $year);
+                                })
+                                ->getUploadedFileNameForStorageUsing(
+                                    fn ($file): string => $file->getClientOriginalName()
+                                )
                                 ->visibility('private')
                                 ->acceptedFileTypes([
                                     'application/pdf',
@@ -124,7 +142,11 @@ class SptRecordForm
                                 ->storeFileNamesIn('spt_file_original_name')
                                 ->previewable(false)
                                 ->downloadable()
-                                ->getUploadedFileUsing(function (string $file, string|array|null $storedFileNames, ?SptRecord $record): ?array {
+                                ->getUploadedFileUsing(function (
+                                    string $file,
+                                    string|array|null $storedFileNames,
+                                    ?SptRecord $record
+                                ): ?array {
                                     return DocumentStorage::uploadedFileData(
                                         $record ? SptDocumentSync::documentFor($record) : null,
                                         $file,
@@ -132,17 +154,26 @@ class SptRecordForm
                                     );
                                 })
                                 ->getDownloadableFileUrlUsing(function (?SptRecord $record): ?string {
-                                    $document = $record ? SptDocumentSync::documentFor($record) : null;
-
-                                    return $document ? route('documents.download', $document) : null;
+                                    $document = $record
+                                        ? SptDocumentSync::documentFor($record)
+                                        : null;
+                            
+                                    return $document
+                                        ? route('documents.download', $document)
+                                        : null;
                                 })
                                 ->preventFilePathTampering(
-                                    allowFilePathUsing: fn (string $file, ?SptRecord $record): bool => $record?->documents()
+                                    allowFilePathUsing: fn (
+                                        string $file,
+                                        ?SptRecord $record
+                                    ): bool => $record?->documents()
                                         ->where('source', SptDocumentSync::SOURCE)
                                         ->where('file_path', $file)
                                         ->exists() ?? false,
                                 )
-                                ->helperText('File otomatis masuk ke menu Dokumen. Format PDF, Word, JPG, atau PNG; maksimal 20 MB. Upload baru mengganti file SPT utama sebelumnya.'),
+                                ->helperText(
+                                    'File otomatis disimpan ke Google Drive. Nama file mengikuti nama file asli. Maksimal 20 MB.'
+                                ),
                             Actions::make([
                                 Action::make('backToPkptIntegration')
                                     ->label('Kembali ke Integrasi PKPT')
