@@ -17,10 +17,10 @@ class CheckGoogleDriveStorage extends Command
     public function handle(): int
     {
         $required = [
-            'GOOGLE_DRIVE_CLIENT_ID' => config('filesystems.disks.google.client_id'),
-            'GOOGLE_DRIVE_CLIENT_SECRET' => config('filesystems.disks.google.client_secret'),
-            'GOOGLE_DRIVE_REFRESH_TOKEN / GOOGLE_DRIVE_ACCESS_TOKEN' => config('filesystems.disks.google.refresh_token') ?: config('filesystems.disks.google.access_token'),
-            'GOOGLE_DRIVE_FOLDER_ID' => config('filesystems.disks.google.folder_id'),
+            'GOOGLE_DRIVE_CLIENT_ID' => config('filesystems.disks.google.clientId'),
+            'GOOGLE_DRIVE_CLIENT_SECRET' => config('filesystems.disks.google.clientSecret'),
+            'GOOGLE_DRIVE_REFRESH_TOKEN' => config('filesystems.disks.google.refreshToken'),
+            'GOOGLE_DRIVE_FOLDER' => config('filesystems.disks.google.folder'),
         ];
 
         $missing = array_keys(array_filter($required, fn (mixed $value): bool => blank($value)));

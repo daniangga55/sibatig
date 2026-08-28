@@ -38,7 +38,7 @@ SIBATIG/
     `-- LAPORAN/{tahun}/
 ```
 
-`GOOGLE_DRIVE_FOLDER_ID` menunjuk ke folder root `SIBATIG`, sehingga path yang tersimpan di database dimulai dari `PKPT/...` atau `NON PKPT/...`. File lama tidak dipindahkan atau dihapus; struktur ini berlaku untuk upload baru dan file pengganti.
+Adapter Masbug memakai `GOOGLE_DRIVE_FOLDER=SIBATIG` sebagai root. Karena itu path yang tersimpan di database dimulai dari `PKPT/...` atau `NON PKPT/...` dan tidak membuat `SIBATIG/Sibatig/...`. File lama tidak dipindahkan atau dihapus; struktur ini berlaku untuk upload baru dan file pengganti.
 
 Client Secret pernah ditempel di dokumen proyek. Rotasi Client Secret di Google Cloud, unduh JSON OAuth yang baru, lalu ganti file lokal `storage/app/credentials/google-drive-oauth.json` sebelum melakukan otorisasi.
 
@@ -56,12 +56,13 @@ GOOGLE_DRIVE_CLIENT_SECRET=
 GOOGLE_DRIVE_REDIRECT_URI=http://127.0.0.1:8000/admin/google-drive/oauth/callback
 GOOGLE_DRIVE_ACCESS_TOKEN=
 GOOGLE_DRIVE_REFRESH_TOKEN=
+GOOGLE_DRIVE_FOLDER=SIBATIG
 GOOGLE_DRIVE_FOLDER_ID=
 GOOGLE_DRIVE_DEBUG=false
 GOOGLE_DRIVE_LOG_PAYLOAD=false
 ```
 
-Client ID dan Client Secret boleh dibiarkan kosong karena aplikasi membacanya dari file JSON. Folder ID juga boleh kosong karena aplikasi akan membuat folder `SIBATIG` dan menyimpan ID-nya secara otomatis.
+Client ID dan Client Secret boleh dibiarkan kosong karena aplikasi membacanya dari file JSON. `GOOGLE_DRIVE_FOLDER` harus bernilai `SIBATIG`. Folder ID boleh kosong karena hanya dipakai oleh proses OAuth untuk mencatat folder yang dibuat; adapter Masbug memakai nama folder root.
 
 ## 3. Otorisasi akun Google
 
@@ -133,13 +134,14 @@ GOOGLE_DRIVE_CREDENTIALS_PATH=storage/app/credentials/google-drive-oauth.json
 GOOGLE_DRIVE_TOKEN_PATH=storage/app/credentials/google-drive-token.json
 GOOGLE_DRIVE_FOLDER_PATH=storage/app/credentials/google-drive-folder.json
 GOOGLE_DRIVE_REDIRECT_URI=https://hehe.serat-ulem.my.id/admin/google-drive/oauth/callback
+GOOGLE_DRIVE_FOLDER=SIBATIG
 ```
 
 Kemudian jalankan dari root project:
 
 ```bash
 composer install --no-dev --optimize-autoloader
-composer show klytron/laravel-google-drive-filesystem
+composer show masbug/flysystem-google-drive-ext
 php artisan package:discover --ansi
 php artisan optimize:clear
 php artisan config:cache

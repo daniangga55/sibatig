@@ -59,15 +59,13 @@ return [
 
         'google' => [
             'driver' => 'google',
-            'client_id' => $googleDrive['client_id'],
-            'client_secret' => $googleDrive['client_secret'],
-            'redirect_uri' => $googleDrive['redirect_uri'],
-            'access_token' => $googleDrive['access_token'],
-            'refresh_token' => $googleDrive['refresh_token'],
-            // Folder ID ini adalah root SIBATIG. Semua path upload bersifat relatif terhadap root tersebut.
-            'folder_id' => $googleDrive['folder_id'],
-            'debug' => $googleDrive['debug'],
-            'log_payload' => $googleDrive['log_payload'],
+            'clientId' => $googleDrive['client_id'],
+            'clientSecret' => $googleDrive['client_secret'],
+            'refreshToken' => $googleDrive['refresh_token'],
+            // Masbug memakai display path sebagai root. Path upload bersifat relatif terhadap SIBATIG.
+            'folder' => trim((string) env('GOOGLE_DRIVE_FOLDER', 'SIBATIG'), '/') ?: 'SIBATIG',
+            'teamDriveId' => env('GOOGLE_DRIVE_TEAM_DRIVE_ID'),
+            'sharedFolderId' => env('GOOGLE_DRIVE_SHARED_FOLDER_ID'),
         ],
 
         's3' => [

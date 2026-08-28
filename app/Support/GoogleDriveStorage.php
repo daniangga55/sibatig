@@ -17,8 +17,8 @@ final class GoogleDriveStorage
     public const REPORT = 'LAPORAN';
 
     /**
-     * Menghasilkan path relatif terhadap folder root SIBATIG yang ditunjuk
-     * oleh GOOGLE_DRIVE_FOLDER_ID. Path ini juga aman dipakai pada disk lokal.
+     * Menghasilkan path relatif terhadap root GOOGLE_DRIVE_FOLDER=SIBATIG.
+     * Path ini juga aman dipakai pada disk lokal.
      */
     public static function path(string $scope, string $documentType, int|string|null $year = null): string
     {
