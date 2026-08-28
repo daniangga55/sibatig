@@ -20,8 +20,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class SptRecordForm
 {
@@ -119,6 +121,19 @@ class SptRecordForm
                                 ->getUploadedFileNameForStorageUsing(
                                     fn ($file): string => $file->getClientOriginalName(),
                                 )
+                                ->saveUploadedFileUsing(fn (
+                                    TemporaryUploadedFile $file,
+                                    Get $get,
+                                    ?SptRecord $record,
+                                ): ?string => GoogleDriveStorage::storeUploadedFile(
+                                    $file,
+                                    SptDocumentSync::diskNameFor($record),
+                                    GoogleDriveStorage::path(
+                                        $scope,
+                                        GoogleDriveStorage::SPT,
+                                        self::uploadYear($get, $record),
+                                    ),
+                                ))
                                 ->visibility('private')
                                 ->acceptedFileTypes([
                                     'application/pdf',
@@ -140,7 +155,7 @@ class SptRecordForm
                                     $document = $record
                                         ? SptDocumentSync::documentFor($record)
                                         : null;
-                            
+
                                     return $document
                                         ? route('documents.download', $document)
                                         : null;

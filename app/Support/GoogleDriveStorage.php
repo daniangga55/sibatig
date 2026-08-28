@@ -2,7 +2,9 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 final class GoogleDriveStorage
 {
@@ -27,6 +29,31 @@ final class GoogleDriveStorage
         $year = self::normalizeYear($year);
 
         return "{$scope}/{$documentType}/{$year}";
+    }
+
+    /**
+     * Pastikan seluruh folder tujuan tersedia sebelum file dikirim ke disk.
+     * Masbug juga dapat membuat remote folder otomatis, tetapi langkah eksplisit
+     * ini menghasilkan kegagalan yang lebih jelas jika akun tidak memiliki izin.
+     */
+    public static function storeUploadedFile(
+        TemporaryUploadedFile $file,
+        string $disk,
+        string $directory,
+    ): ?string {
+        if (! $file->exists()) {
+            return null;
+        }
+
+        $storage = Storage::disk($disk);
+
+        if (! $storage->directoryExists($directory)) {
+            $storage->makeDirectory($directory);
+        }
+
+        $originalName = basename(str_replace('\\', '/', $file->getClientOriginalName()));
+
+        return $file->storeAs($directory, $originalName, $disk);
     }
 
     private static function normalizeScope(string $scope): string

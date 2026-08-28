@@ -15,6 +15,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class AssignmentDocumentForm
 {
@@ -76,6 +77,18 @@ class AssignmentDocumentForm
                         ->getUploadedFileNameForStorageUsing(
                             fn ($file): string => $file->getClientOriginalName(),
                         )
+                        ->saveUploadedFileUsing(fn (
+                            TemporaryUploadedFile $file,
+                            Get $get,
+                            WorkPaper|AssignmentReport|null $record,
+                        ): ?string => GoogleDriveStorage::storeUploadedFile(
+                            $file,
+                            AssignmentFileStorage::diskName($record),
+                            GoogleDriveStorage::path(
+                                $scope,
+                                $documentType
+                            ),
+                        ))
                         ->visibility('private')
                         ->acceptedFileTypes($acceptedTypes)
                         ->maxSize(20480)
