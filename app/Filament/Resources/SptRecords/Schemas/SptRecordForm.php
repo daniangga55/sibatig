@@ -137,12 +137,19 @@ class SptRecordForm
                                     $storedFileNames,
                                 ))
                                 ->getDownloadableFileUrlUsing(function (?SptRecord $record): ?string {
-                                    $document = $record ? SptDocumentSync::documentFor($record) : null;
-
-                                    return $document ? route('documents.download', $document) : null;
+                                    $document = $record
+                                        ? SptDocumentSync::documentFor($record)
+                                        : null;
+                            
+                                    return $document
+                                        ? route('documents.download', $document)
+                                        : null;
                                 })
                                 ->preventFilePathTampering(
-                                    allowFilePathUsing: fn (string $file, ?SptRecord $record): bool => $record?->documents()
+                                    allowFilePathUsing: fn (
+                                        string $file,
+                                        ?SptRecord $record
+                                    ): bool => $record?->documents()
                                         ->where('source', SptDocumentSync::SOURCE)
                                         ->where('file_path', $file)
                                         ->exists() ?? false,
