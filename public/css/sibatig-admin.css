@@ -220,10 +220,10 @@ body {
     color: #fff !important;
 }
 
-.fi-sidebar-item-badge-ctn .fi-badge {
-    color: #d7e7fa;
-    background: rgba(255, 255, 255, .12);
-    box-shadow: none;
+/* Sidebar hanya menampilkan ikon dan label; badge jumlah tetap tersedia pada
+   backend Filament, tetapi tidak dirender secara visual di menu. */
+.fi-sidebar-item-badge-ctn {
+    display: none !important;
 }
 
 .sibatig-sidebar-help {

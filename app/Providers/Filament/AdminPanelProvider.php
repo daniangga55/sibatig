@@ -45,7 +45,7 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::hex(WebsiteSetting::themeColor('primary_color', '#1769d2')),
             ])
             ->assets([
-                Css::make('sibatig-admin', asset('css/sibatig-admin.css').'?v=17'),
+                Css::make('sibatig-admin', asset('css/sibatig-admin.css').'?v=18'),
             ])
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('filament.partials.theme-variables'))
             ->renderHook(PanelsRenderHook::SIMPLE_LAYOUT_START, fn () => view('filament.partials.auth-showcase'))
