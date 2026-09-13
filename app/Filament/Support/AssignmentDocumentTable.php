@@ -3,6 +3,7 @@
 namespace App\Filament\Support;
 
 use App\Models\AssignmentReport;
+use App\Models\SupportingDocument;
 use App\Models\WorkPaper;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -29,10 +30,15 @@ class AssignmentDocumentTable
         return self::configure($table, $scope, true);
     }
 
-    private static function configure(Table $table, string $scope, bool $report): Table
+    public static function supportingDocument(Table $table, string $scope): Table
+    {
+        return self::configure($table, $scope, false, true);
+    }
+
+    private static function configure(Table $table, string $scope, bool $report, bool $supportingDocument = false): Table
     {
         $parentRelationship = $scope === 'PKPT' ? 'sptRecord.pkptActivity.assignment' : 'sptRecord.nonPkptActivity.assignment';
-        $routeName = $report ? 'assignment-reports.download' : 'work-papers.download';
+        $routeName = $report ? 'assignment-reports.download' : ($supportingDocument ? 'supporting-documents.download' : 'work-papers.download');
 
         return $table
             ->deferLoading()
@@ -65,7 +71,7 @@ class AssignmentDocumentTable
                     ->label('Unduh')
                     ->icon(Heroicon::OutlinedArrowDownTray)
                     ->color('success')
-                    ->url(fn (WorkPaper|AssignmentReport $record): string => route($routeName, $record))
+                    ->url(fn (WorkPaper|AssignmentReport|SupportingDocument $record): string => route($routeName, $record))
                     ->openUrlInNewTab(),
                 ViewAction::make(),
                 EditAction::make(),

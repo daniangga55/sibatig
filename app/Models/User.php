@@ -50,6 +50,11 @@ class User extends Authenticatable implements FilamentUser, HasName
         return $this->hasMany(Document::class, 'uploaded_by');
     }
 
+    public function uploadedSupportingDocuments(): HasMany
+    {
+        return $this->hasMany(SupportingDocument::class, 'uploaded_by');
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->is_active;

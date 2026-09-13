@@ -52,4 +52,9 @@ class SptRecord extends Model
     {
         return $this->hasMany(AssignmentReport::class);
     }
+
+    public function supportingDocuments(): HasMany
+    {
+        return $this->hasMany(SupportingDocument::class);
+    }
 }

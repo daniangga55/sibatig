@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AssignmentReport;
+use App\Models\SupportingDocument;
 use App\Models\WorkPaper;
 use App\Support\AssignmentFileStorage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -22,7 +23,12 @@ class AssignmentFileDownloadController extends Controller
         return $this->download($assignmentReport);
     }
 
-    private function download(WorkPaper|AssignmentReport $file): StreamedResponse
+    public function supportingDocument(SupportingDocument $supportingDocument): StreamedResponse
+    {
+        return $this->download($supportingDocument);
+    }
+
+    private function download(WorkPaper|AssignmentReport|SupportingDocument $file): StreamedResponse
     {
         $this->authorize('view', $file);
 

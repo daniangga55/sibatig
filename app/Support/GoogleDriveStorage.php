@@ -19,6 +19,8 @@ final class GoogleDriveStorage
 
     public const REPORT = 'LAPORAN';
 
+    public const SUPPORTING_DOCUMENT = 'DOKUMEN PENDUKUNG';
+
     /**
      * Menghasilkan path relatif terhadap root GOOGLE_DRIVE_FOLDER=SIBATIG.
      * Path ini juga aman dipakai pada disk lokal.
@@ -91,6 +93,7 @@ final class GoogleDriveStorage
             self::SPT => self::SPT,
             self::WORK_PAPER, 'WORK PAPER', 'WORK PAPERS' => self::WORK_PAPER,
             self::REPORT, 'LAPORAN HASIL PENUGASAN', 'ASSIGNMENT REPORT', 'ASSIGNMENT REPORTS' => self::REPORT,
+            self::SUPPORTING_DOCUMENT, 'SUPPORTING DOCUMENT', 'SUPPORTING DOCUMENTS' => self::SUPPORTING_DOCUMENT,
             default => throw new InvalidArgumentException("Jenis dokumen [{$documentType}] tidak didukung."),
         };
     }

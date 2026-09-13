@@ -18,10 +18,15 @@ class AssignmentDocumentInfolist
         return self::configure($schema, true);
     }
 
-    private static function configure(Schema $schema, bool $report): Schema
+    public static function supportingDocument(Schema $schema): Schema
+    {
+        return self::configure($schema, false, true);
+    }
+
+    private static function configure(Schema $schema, bool $report, bool $supportingDocument = false): Schema
     {
         return $schema->components([
-            Section::make($report ? 'Laporan Hasil Penugasan' : 'Kertas Kerja')
+            Section::make($report ? 'Laporan Hasil Penugasan' : ($supportingDocument ? 'Dokumen Pendukung' : 'Kertas Kerja'))
                 ->columns(3)
                 ->schema([
                     TextEntry::make('title')->label('Judul')->columnSpan(2),

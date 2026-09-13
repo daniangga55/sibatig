@@ -25,6 +25,10 @@ Route::get('/admin/assignment-reports/{assignmentReport}/download', [AssignmentF
     ->middleware('auth')
     ->name('assignment-reports.download');
 
+Route::get('/admin/supporting-documents/{supportingDocument}/download', [AssignmentFileDownloadController::class, 'supportingDocument'])
+    ->middleware('auth')
+    ->name('supporting-documents.download');
+
 Route::middleware(['auth', 'throttle:6,1'])->group(function (): void {
     Route::get('/admin/google-drive/oauth/authorize', [GoogleDriveOAuthController::class, 'authorizeDrive'])
         ->name('google-drive.oauth.authorize');

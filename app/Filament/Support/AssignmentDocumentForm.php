@@ -4,6 +4,7 @@ namespace App\Filament\Support;
 
 use App\Models\AssignmentReport;
 use App\Models\SptRecord;
+use App\Models\SupportingDocument;
 use App\Models\WorkPaper;
 use App\Support\AssignmentFileStorage;
 use App\Support\GoogleDriveStorage;
@@ -29,24 +30,53 @@ class AssignmentDocumentForm
         return self::configure($schema, $scope, 'assignment-report');
     }
 
+    public static function supportingDocument(Schema $schema, string $scope): Schema
+    {
+        return self::configure($schema, $scope, 'supporting-document');
+    }
+
     private static function configure(Schema $schema, string $scope, string $type): Schema
     {
         $isReport = $type === 'assignment-report';
+        $isSupportingDocument = $type === 'supporting-document';
         $label = $scope === 'PKPT' ? 'PKPT' : 'Non-PKPT';
-        $modelClass = $isReport ? AssignmentReport::class : WorkPaper::class;
-        $routeName = $isReport ? 'assignment-reports.download' : 'work-papers.download';
-        $documentType = $isReport ? GoogleDriveStorage::REPORT : GoogleDriveStorage::WORK_PAPER;
+        $routeName = match ($type) {
+            'assignment-report' => 'assignment-reports.download',
+            'supporting-document' => 'supporting-documents.download',
+            default => 'work-papers.download',
+        };
+        $documentType = match ($type) {
+            'assignment-report' => GoogleDriveStorage::REPORT,
+            'supporting-document' => GoogleDriveStorage::SUPPORTING_DOCUMENT,
+            default => GoogleDriveStorage::WORK_PAPER,
+        };
         $acceptedTypes = $isReport
             ? ['application/pdf']
-            : [
+            : ($isSupportingDocument ? [
+                'application/pdf',
                 'application/vnd.ms-excel',
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 'application/msword',
                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            ];
+                'application/vnd.ms-powerpoint',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                'image/jpeg',
+                'image/png',
+            ] : [
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            ]);
+
+        $sectionTitle = match ($type) {
+            'assignment-report' => "Laporan Hasil Penugasan {$label}",
+            'supporting-document' => "Dokumen Pendukung {$label}",
+            default => "Kertas Kerja {$label}",
+        };
 
         return $schema->components([
-            Section::make($isReport ? "Laporan Hasil Penugasan {$label}" : "Kertas Kerja {$label}")
+            Section::make($sectionTitle)
                 ->description('File disimpan privat dan wajib terhubung ke Surat Perintah Tugas.')
                 ->columns(3)
                 ->schema([
@@ -67,8 +97,12 @@ class AssignmentDocumentForm
                         DatePicker::make('document_date')->label('Tanggal dokumen')->native(false)->displayFormat('d/m/Y'),
                     ]),
                     FileUpload::make('file_path')
-                        ->label($isReport ? 'File laporan PDF' : 'File kertas kerja')
-                        ->disk(fn (WorkPaper|AssignmentReport|null $record): string => AssignmentFileStorage::diskName($record))
+                        ->label(match ($type) {
+                            'assignment-report' => 'File laporan PDF',
+                            'supporting-document' => 'File dokumen pendukung',
+                            default => 'File kertas kerja',
+                        })
+                        ->disk(fn (WorkPaper|AssignmentReport|SupportingDocument|null $record): string => AssignmentFileStorage::diskName($record))
                         ->directory(fn (Get $get): string => GoogleDriveStorage::path(
                             $scope,
                             $documentType,
@@ -80,13 +114,14 @@ class AssignmentDocumentForm
                         ->saveUploadedFileUsing(fn (
                             TemporaryUploadedFile $file,
                             Get $get,
-                            WorkPaper|AssignmentReport|null $record,
+                            WorkPaper|AssignmentReport|SupportingDocument|null $record,
                         ): ?string => GoogleDriveStorage::storeUploadedFile(
                             $file,
                             AssignmentFileStorage::diskName($record),
                             GoogleDriveStorage::path(
                                 $scope,
-                                $documentType
+                                $documentType,
+                                $get('year') ?: date('Y'),
                             ),
                         ))
                         ->visibility('private')
@@ -95,17 +130,19 @@ class AssignmentDocumentForm
                         ->storeFileNamesIn('original_name')
                         ->previewable(false)
                         ->downloadable()
-                        ->getUploadedFileUsing(fn (string $file, string|array|null $storedFileNames, WorkPaper|AssignmentReport|null $record): ?array => AssignmentFileStorage::uploadedFileData(
+                        ->getUploadedFileUsing(fn (string $file, string|array|null $storedFileNames, WorkPaper|AssignmentReport|SupportingDocument|null $record): ?array => AssignmentFileStorage::uploadedFileData(
                             $record,
                             $file,
                             $storedFileNames,
                             $routeName,
                         ))
-                        ->getDownloadableFileUrlUsing(fn (WorkPaper|AssignmentReport|null $record): ?string => $record ? route($routeName, $record) : null)
-                        ->preventFilePathTampering(allowFilePathUsing: fn (string $file, WorkPaper|AssignmentReport|null $record): bool => $record?->file_path === $file)
-                        ->required(fn (WorkPaper|AssignmentReport|null $record): bool => $record === null)
+                        ->getDownloadableFileUrlUsing(fn (WorkPaper|AssignmentReport|SupportingDocument|null $record): ?string => $record ? route($routeName, $record) : null)
+                        ->preventFilePathTampering(allowFilePathUsing: fn (string $file, WorkPaper|AssignmentReport|SupportingDocument|null $record): bool => $record?->file_path === $file)
+                        ->required(fn (WorkPaper|AssignmentReport|SupportingDocument|null $record): bool => $record === null)
                         ->helperText(
-                            ($isReport ? 'Hanya PDF' : 'Format XLSX, XLS, DOCX, atau DOC')
+                            ($isReport
+                                ? 'Hanya PDF'
+                                : ($isSupportingDocument ? 'Format PDF, XLSX, XLS, DOCX, DOC, PPTX, PPT, JPG, atau PNG' : 'Format XLSX, XLS, DOCX, atau DOC'))
                             .". Disimpan ke Google Drive: SIBATIG/{$scope}/{$documentType}/{tahun}; nama file asli dipertahankan. Maksimal 20 MB."
                         )
                         ->columnSpanFull(),

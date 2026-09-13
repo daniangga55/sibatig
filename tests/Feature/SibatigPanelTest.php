@@ -26,6 +26,8 @@ use App\Filament\Resources\NonPkptMonitoringEvaluations\Pages\ListNonPkptMonitor
 use App\Filament\Resources\NonPkptSptRecords\Pages\CreateNonPkptSptRecord;
 use App\Filament\Resources\NonPkptSptRecords\Pages\EditNonPkptSptRecord;
 use App\Filament\Resources\NonPkptSptRecords\Pages\ListNonPkptSptRecords;
+use App\Filament\Resources\NonPkptSupportingDocuments\Pages\CreateNonPkptSupportingDocument;
+use App\Filament\Resources\NonPkptSupportingDocuments\Pages\ListNonPkptSupportingDocuments;
 use App\Filament\Resources\NonPkptWorkPapers\Pages\CreateNonPkptWorkPaper;
 use App\Filament\Resources\NonPkptWorkPapers\Pages\ListNonPkptWorkPapers;
 use App\Filament\Resources\PkptActivities\Pages\CreatePkptActivity;
@@ -36,6 +38,8 @@ use App\Filament\Resources\SptRecords\Pages\CreateSptRecord;
 use App\Filament\Resources\SptRecords\Pages\EditSptRecord;
 use App\Filament\Resources\SptRecords\Pages\ListSptRecords;
 use App\Filament\Resources\SptRecords\Pages\ViewSptRecord;
+use App\Filament\Resources\SupportingDocuments\Pages\CreateSupportingDocument;
+use App\Filament\Resources\SupportingDocuments\Pages\ListSupportingDocuments;
 use App\Filament\Resources\TeamMembers\Pages\CreateTeamMember;
 use App\Filament\Resources\TeamMembers\Pages\EditTeamMember;
 use App\Filament\Resources\TeamMembers\Pages\ListTeamMembers;
@@ -58,6 +62,7 @@ use App\Models\MonitoringEvaluation;
 use App\Models\NonPkptActivity;
 use App\Models\PkptActivity;
 use App\Models\SptRecord;
+use App\Models\SupportingDocument;
 use App\Models\TeamMember;
 use App\Models\User;
 use App\Models\WebsiteSetting;
@@ -549,6 +554,8 @@ class SibatigPanelTest extends TestCase
         Livewire::test(ListNonPkptWorkPapers::class)->assertSuccessful();
         Livewire::test(ListAssignmentReports::class)->assertSuccessful();
         Livewire::test(ListNonPkptAssignmentReports::class)->assertSuccessful();
+        Livewire::test(ListSupportingDocuments::class)->assertSuccessful();
+        Livewire::test(ListNonPkptSupportingDocuments::class)->assertSuccessful();
 
         Livewire::test(CreateNonPkptActivity::class)
             ->fillForm([
@@ -674,9 +681,52 @@ class SibatigPanelTest extends TestCase
         $this->assertSame('PKPT/SPT/2026', GoogleDriveStorage::path('PKPT', 'SPT', 2026));
         $this->assertSame('PKPT/KERTAS KERJA/2026', GoogleDriveStorage::path('PKPT', 'work-paper', 2026));
         $this->assertSame('PKPT/LAPORAN/2026', GoogleDriveStorage::path('PKPT', 'assignment-report', 2026));
+        $this->assertSame('PKPT/DOKUMEN PENDUKUNG/2026', GoogleDriveStorage::path('PKPT', 'supporting-document', 2026));
         $this->assertSame('NON PKPT/SPT/2026', GoogleDriveStorage::path('NON PKPT', 'SPT', 2026));
         $this->assertSame('NON PKPT/KERTAS KERJA/2026', GoogleDriveStorage::path('non-pkpt', 'KERTAS KERJA', 2026));
         $this->assertSame('NON PKPT/LAPORAN/2026', GoogleDriveStorage::path('NON_PKPT', 'LAPORAN', 2026));
+        $this->assertSame('NON PKPT/DOKUMEN PENDUKUNG/2026', GoogleDriveStorage::path('NON_PKPT', 'DOKUMEN PENDUKUNG', 2026));
+    }
+
+    public function test_supporting_documents_are_scoped_and_stored_privately(): void
+    {
+        config(['filesystems.documents' => 'local']);
+        Storage::fake('local');
+
+        $pkptSpt = SptRecord::query()->where('relation_type', 'PKPT')->firstOrFail();
+
+        Livewire::test(CreateSupportingDocument::class)
+            ->fillForm([
+                'year' => 2026,
+                'spt_record_id' => $pkptSpt->id,
+                'title' => 'Bukti Pendukung PKPT',
+                'document_date' => '2026-09-13',
+                'file_path' => UploadedFile::fake()->create('bukti-pkpt.pdf', 100, 'application/pdf'),
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $pkptDocument = SupportingDocument::query()->where('spt_record_id', $pkptSpt->id)->firstOrFail();
+        $this->assertSame('PKPT/DOKUMEN PENDUKUNG/2026/bukti-pkpt.pdf', $pkptDocument->file_path);
+        Storage::disk('local')->assertExists($pkptDocument->file_path);
+        $this->get(route('supporting-documents.download', $pkptDocument))
+            ->assertOk()
+            ->assertDownload('bukti-pkpt.pdf');
+
+        $nonPkptSpt = SptRecord::query()->where('relation_type', 'NON PKPT')->firstOrFail();
+
+        Livewire::test(CreateNonPkptSupportingDocument::class)
+            ->fillForm([
+                'year' => 2026,
+                'spt_record_id' => $nonPkptSpt->id,
+                'title' => 'Bukti Pendukung Non-PKPT',
+                'file_path' => UploadedFile::fake()->create('bukti-non-pkpt.docx', 100, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $nonPkptDocument = SupportingDocument::query()->where('spt_record_id', $nonPkptSpt->id)->firstOrFail();
+        $this->assertSame('NON PKPT/DOKUMEN PENDUKUNG/2026/bukti-non-pkpt.docx', $nonPkptDocument->file_path);
     }
 
     public function test_non_pkpt_upload_forms_use_the_non_pkpt_drive_folders(): void
